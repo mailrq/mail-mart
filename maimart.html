@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mail Mart</title>
+    <!-- Google Fonts & FontAwesome for Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Light & Dark Theme Variables */
+        :root.dark-theme {
+            --bg-body: radial-gradient(circle at top center, #0f172a, #020617, #000000);
+            --card-bg: rgba(15, 23, 42, 0.85);
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --input-bg: rgba(30, 41, 59, 0.9);
+            --shadow-color: rgba(0, 0, 0, 0.7);
+            --header-bg: rgba(15, 23, 42, 0.88);
+            --nav-bg: rgba(15, 23, 42, 0.92);
+        }
+
+        :root.light-theme {
+            --bg-body: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --input-bg: rgba(241, 245, 249, 0.9);
+            --shadow-color: rgba(0, 0, 0, 0.08);
+            --header-bg: rgba(255, 255, 255, 0.88);
+            --nav-bg: rgba(255, 255, 255, 0.92);
+        }
+
+        body {
+            background: var(--bg-body);
+            background-attachment: fixed;
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding-bottom: 70px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Theme Toggle Top Button */
+        .theme-toggle-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            transition: 0.3s;
+            flex-shrink: 0;
+        }
+        .theme-toggle-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Brand Logo Redesign (Mail Mart) */
+        .brand-logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            color: #ffffff;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        /* --- PERFECT RESPONSIVE DUAL SLIDING AUTH PANEL --- */
+        .auth-wrapper-body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .auth-main-container {
+            position: relative;
+            width: 900px;
+            max-width: 100%;
+            min-height: 580px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 28px;
+            box-shadow: 0 25px 50px var(--shadow-color);
+            overflow: hidden;
+        }
+
+        .auth-form-container {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            transition: all 0.6s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            width: 50%;
+            overflow-y: auto;
+        }
+
+        .auth-sign-in-container { left: 0; z-index: 2; opacity: 1; pointer-events: auto; }
+        .auth-main-container.right-panel-active .auth-sign-in-container { transform: translateX(100%); opacity: 0; pointer-events: none; z-index: 1; }
+        .auth-sign-up-container { left: 0; opacity: 0; pointer-events: none; z-index: 1; }
+        .auth-main-container.right-panel-active .auth-sign-up-container { transform: translateX(100%); opacity: 1; pointer-events: auto; z-index: 5; animation: showAnim 0.6s; }
+
+        @keyframes showAnim {
+            0%, 49% { opacity: 0; z-index: 1; }
+            50%, 100% { opacity: 1; z-index: 5; }
+        }
+
+        .auth-overlay-container {
+            position: absolute; top: 0; left: 50%; width: 50%; height: 100%; overflow: hidden; transition: transform 0.6s ease-in-out; z-index: 100;
+        }
+        .auth-main-container.right-panel-active .auth-overlay-container { transform: translateX(-100%); }
+        .auth-overlay {
+            background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; position: relative; left: -100%; height: 100%; width: 200%; transform: translateX(0); transition: transform 0.6s ease-in-out;
+        }
+        .auth-main-container.right-panel-active .auth-overlay { transform: translateX(50%); }
+        .auth-overlay-panel {
+            position: absolute; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 0 40px; text-align: center; top: 0; height: 100%; width: 50%; transition: transform 0.6s ease-in-out;
+        }
+        .auth-overlay-left { transform: translateX(-200%); }
+        .auth-main-container.right-panel-active .auth-overlay-left { transform: translateX(0); }
+        .auth-overlay-right { right: 0; transform: translateX(0); }
+        .auth-main-container.right-panel-active .auth-overlay-right { transform: translateX(200%); }
+
+        .auth-input-group { position: relative; width: 100%; margin: 8px 0; }
+        .auth-input-group input {
+            background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 12px 42px 12px 42px; font-size: 14px; width: 100%; border-radius: 14px; outline: none; transition: 0.3s;
+        }
+        .auth-input-group input:focus { border-color: #6366f1; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2); }
+        .auth-input-group i.field-icon { position: absolute; top: 50%; left: 14px; transform: translateY(-50%); color: var(--text-sub); font-size: 14px; pointer-events: none; }
+        .auth-input-group i.toggle-password { position: absolute; top: 50%; right: 14px; transform: translateY(-50%); color: var(--text-sub); font-size: 14px; cursor: pointer; z-index: 10; }
+
+        .auth-ghost-btn {
+            background-color: transparent; border: 2px solid #fff; border-radius: 12px; color: #fff; font-size: 13px; font-weight: 600; padding: 10px 30px; text-transform: uppercase; cursor: pointer; transition: 0.3s; margin-top: 15px;
+        }
+        .auth-ghost-btn:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05); }
+
+        /* Mobile Responsive Fix for Auth Layout (Stacked instead of slider on small screens) */
+        @media (max-width: 768px) {
+            .auth-wrapper-body { padding: 10px; align-items: flex-start; padding-top: 20px; }
+            .auth-main-container { width: 100%; min-height: auto; border-radius: 20px; overflow: visible; display: flex; flex-direction: column; }
+            .auth-overlay-container { display: none !important; }
+            .auth-form-container { position: relative !important; width: 100% !important; height: auto !important; padding: 24px 18px !important; transform: none !important; opacity: 1 !important; pointer-events: auto !important; display: none; }
+            .auth-form-container.mobile-active { display: flex !important; }
+            .mobile-switch-text { display: block !important; text-align: center; margin-top: 15px; font-size: 13px; color: var(--text-sub); }
+            .mobile-switch-text a { color: #6366f1; font-weight: 700; text-decoration: none; cursor: pointer; }
+        }
+        @media (min-width: 769px) {
+            .mobile-switch-text { display: none !important; }
+        }
+
+        .user-container { display: none; }
+
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--nav-bg); backdrop-filter: blur(15px);
+            border-top: 1px solid var(--border-color);
+            display: flex; justify-content: space-around;
+            padding: 10px 0; z-index: 1000;
+        }
+        .bottom-nav a {
+            color: var(--text-sub); text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 600; gap: 4px; transition: 0.2s;
+        }
+        .bottom-nav a i { font-size: 18px; }
+        .bottom-nav a.active, .bottom-nav a:hover { color: #6366f1; text-shadow: 0 0 10px rgba(99, 102, 241, 0.4); }
+
+        .top-header {
+            background: var(--header-bg); backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 999;
+        }
+        .main-content { padding: 24px; max-width: 1100px; margin: 0 auto; }
+        
+        .shop-layout-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        .sidebar-categories {
+            width: 260px;
+            flex-shrink: 0;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 18px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            position: sticky;
+            top: 80px;
+        }
+        .sidebar-categories h6 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-sub);
+            margin-bottom: 12px;
+            padding-left: 8px;
+            font-weight: 700;
+        }
+        .main-categories-wrapper { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+        }
+        .main-category-pill {
+            background-color: var(--input-bg); 
+            border: 1px solid var(--border-color); 
+            color: var(--text-sub); 
+            padding: 12px 16px; 
+            border-radius: 14px; 
+            font-weight: 600; 
+            font-size: 14px; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px;
+            width: 100%;
+            text-align: left;
+        }
+        .main-category-pill:hover { 
+            color: var(--text-main); 
+            background: rgba(99, 102, 241, 0.1); 
+            transform: translateX(4px);
+        }
+        .main-category-pill.active {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            color: #ffffff;
+            border-color: #6366f1;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .shop-content-area {
+            flex-grow: 1;
+            width: 100%;
+        }
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+
+        @media (max-width: 768px) {
+            .shop-layout-container { flex-direction: row; gap: 12px; align-items: flex-start; }
+            .sidebar-categories { width: 140px; min-width: 140px; padding: 10px; position: sticky; top: 70px; }
+            .sidebar-categories h6 { font-size: 11px; padding-left: 4px; margin-bottom: 8px; }
+            .main-category-pill { padding: 8px 10px; font-size: 11px; gap: 6px; border-radius: 10px; }
+            .shop-grid { grid-template-columns: 1fr; }
+        }
+
+        .card-box { 
+            background: var(--card-bg); backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color); border-radius: 24px; padding: 24px; width: 100%; 
+            box-shadow: 0 15px 35px var(--shadow-color); display: flex; flex-direction: column; justify-content: space-between; 
+        }
+
+        .shop-item-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px var(--shadow-color);
+        }
+        .shop-item-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(168, 85, 247, 0.05));
+            opacity: 0; transition: opacity 0.35s ease; pointer-events: none;
+        }
+        .shop-item-card:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+            transform: translateY(-6px);
+        }
+        .shop-item-card:hover::after { opacity: 1; }
+
+        .buy-now-btn {
+            color: #ffffff; font-weight: 700; border-radius: 14px; padding: 12px 18px; width: 100%; border: none; 
+            display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; 
+            text-transform: uppercase; letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            transition: 0.3s;
+        }
+        .buy-now-btn:hover { transform: scale(1.03); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5); }
+
+        .animated-price { color: #6366f1 !important; font-weight: 800; }
+        .price-wrapper { display: flex; align-items: baseline; gap: 4px; margin-top: 6px; margin-bottom: 14px; }
+
+        .stock-tag { font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+        .stock-tag.available { color: #10b981; }
+        .stock-tag.out { color: #ef4444; }
+
+        .pay-method-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+        .pay-method-card {
+            background: var(--input-bg); border: 2px solid var(--border-color); border-radius: 16px; padding: 18px 12px; cursor: pointer; transition: all 0.25s ease; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;
+        }
+        .pay-method-card:hover { border-color: #6366f1; transform: translateY(-2px); }
+        .pay-method-card.selected { border-color: #6366f1; background: rgba(99, 102, 241, 0.1); box-shadow: 0 0 20px rgba(99, 102, 241, 0.2); }
+
+        .pay-logo { 
+            width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #ffffff; overflow: hidden; background-color: var(--input-bg); flex-shrink: 0;
+        }
+        .pay-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+        .logo-bkash { background: linear-gradient(135deg, #e2136e, #b80c54); }
+        .logo-nagad { background: linear-gradient(135deg, #ec1c24, #b51218); }
+        .logo-rocket { background: linear-gradient(135deg, #8c359d, #62216e); }
+        .logo-binance { background: linear-gradient(135deg, #fcd535, #e0b810); color: #181a20 !important; }
+        .logo-upay { background: linear-gradient(135deg, #f36c21, #c45112); }
+        .logo-default { background: linear-gradient(135deg, #6366f1, #a855f7); }
+
+        .form-control, .form-select { 
+            background-color: var(--input-bg) !important; color: var(--text-main) !important; 
+            border: 1px solid var(--border-color) !important; border-radius: 14px; padding: 12px 16px; font-size: 14px; 
+        }
+        .form-control::placeholder { color: var(--text-sub) !important; opacity: 1 !important; }
+        .form-control:focus { border-color: #6366f1 !important; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25); color: var(--text-main) !important; }
+
+        .table { color: var(--text-main) !important; vertical-align: middle; font-size: 13px; }
+        .table th { background-color: var(--input-bg) !important; color: var(--text-main) !important; border-color: var(--border-color) !important; font-weight: 600; padding: 14px 12px; }
+        .table td { background-color: transparent !important; border-color: var(--border-color) !important; color: var(--text-sub) !important; padding: 14px 12px; }
+
+        .section-pane { display: none; }
+        .section-pane.active { display: block; }
+
+        .qty-box { display: flex; align-items: center; justify-content: center; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; width: 160px; }
+        .qty-btn { background: transparent; border: none; color: var(--text-main); padding: 8px 16px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .qty-input { background: transparent; border: none; color: var(--text-main); width: 60px; text-align: center; font-weight: bold; font-size: 15px; outline: none; }
+
+        .custom-alert-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(3, 7, 18, 0.82); backdrop-filter: blur(10px); z-index: 999999; display: none; justify-content: center; align-items: center; padding: 20px;
+        }
+        .custom-alert-box { 
+            background: var(--card-bg); backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color); border-radius: 28px; 
+            width: 100%; max-width: 520px; max-height: 85vh; overflow-y: auto; padding: 32px; box-shadow: 0 25px 60px var(--shadow-color); margin: auto; 
+        }
+
+        .modal-display-box { background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px; color: var(--text-main); }
+        .modal-account-data-box {
+            background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px; font-family: monospace; color: #10b981; font-size: 13px; line-height: 1.6; max-height: 220px; overflow-y: auto; white-space: pre-wrap; word-break: break-all;
+            user-select: all !important; -webkit-user-select: all !important;
+        }
+        .item-description { color: var(--text-sub); font-size: 13px; margin-bottom: 12px; white-space: pre-wrap; line-height: 1.5; }
+
+        .telegram-float {
+            position: fixed; bottom: 75px; right: 20px; background: linear-gradient(135deg, #229ed9, #1b82b4); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 6px 20px rgba(34, 158, 217, 0.5); z-index: 1001; text-decoration: none; transition: 0.3s;
+        }
+        .telegram-float:hover { transform: scale(1.1); color: #fff; }
+        .profile-info-card { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px 20px; }
+        .btn-close-custom { background: transparent; border: none; color: var(--text-sub); font-size: 18px; cursor: pointer; }
+        
+        .user-notification-banner {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 20px; padding: 18px 24px; margin-bottom: 24px;
+            display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; box-shadow: 0 8px 30px var(--shadow-color);
+            backdrop-filter: blur(12px); word-break: break-word;
+        }
+        
+        .notice-modal-content {
+            font-size: 15px; line-height: 1.7; color: var(--text-sub);
+            background: var(--input-bg); border: 1px solid var(--border-color);
+            border-radius: 16px; padding: 20px; max-height: 50vh; overflow-y: auto;
+            word-break: break-word; white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body class="dark-theme">
+
+<div id="custom-alert-overlay" class="custom-alert-overlay">
+    <div class="custom-alert-box" style="max-width: 520px; padding: 30px;">
+        <div class="d-flex align-items-center justify-content-between mb-3 border-bottom border-secondary border-opacity-25 pb-3">
+            <span class="fw-bold text-primary fs-5"><i class="fa-solid fa-bullhorn me-2"></i>Important Notice</span>
+            <button onclick="closeCustomAlert()" class="btn-close-custom"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="custom-alert-message" class="py-2 mb-4 notice-modal-content"></div>
+        <div class="text-end">
+            <button onclick="closeCustomAlert()" class="btn btn-success rounded-pill px-5 fw-bold py-2.5 shadow" style="background: linear-gradient(135deg, #6366f1, #a855f7); border: none; min-width: 130px;">
+                <i class="fa-solid fa-check me-1"></i> Got it!
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Buy Modal -->
+<div id="purchase-modal-overlay" class="custom-alert-overlay">
+    <div class="custom-alert-box position-relative">
+        <div id="modal-error-banner" class="alert alert-danger py-2 px-3 mb-3 text-center fw-bold shadow-sm" style="display: none; font-size: 13px; border-radius: 12px;"></div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <span class="fw-bold fs-5" style="color: var(--text-main);"><i class="fa-solid fa-cart-shopping me-2 text-primary"></i>Confirm Purchase</span>
+            <button onclick="closePurchaseModal()" class="btn-close-custom"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="mb-3">
+            <div class="text-sub small mb-1 fw-semibold">Category</div>
+            <div id="modal-cat-name" class="fw-bold text-primary fs-6"></div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <div class="text-sub small fw-semibold">Price Per Unit</div>
+                <div class="fw-bold fs-6" style="color: var(--text-main);" id="modal-unit-price">৳0</div>
+            </div>
+            <div class="text-end">
+                <div class="text-sub small fw-semibold">Available Stock</div>
+                <div class="fw-bold text-success fs-6" id="modal-stock-count">0</div>
+            </div>
+        </div>
+        <div class="mb-4">
+            <div class="text-sub small mb-2 text-center fw-semibold">Select Quantity</div>
+            <div class="d-flex justify-content-center">
+                <div class="qty-box">
+                    <button onclick="changeModalQty(-1)" class="qty-btn">-</button>
+                    <input type="number" id="modal-qty-input" class="qty-input" value="1" min="1" oninput="onModalQtyTyped(this)">
+                    <button onclick="changeModalQty(1)" class="qty-btn">+</button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-display-box mb-4 d-flex justify-content-between align-items-center">
+            <span class="text-sub fw-semibold">Total Cost:</span>
+            <span class="fw-bold text-success fs-4" id="modal-total-price">৳0.00</span>
+        </div>
+        <div class="d-flex gap-2">
+            <button onclick="closePurchaseModal()" class="btn btn-outline-secondary w-50 rounded-pill fw-bold py-2.5">Cancel</button>
+            <button onclick="confirmAndBuy()" class="btn btn-primary w-50 rounded-pill fw-bold py-2.5" style="background: linear-gradient(135deg, #10b981, #059669); border: none;">Confirm Buy</button>
+        </div>
+    </div>
+</div>
+
+<div id="order-view-modal" class="custom-alert-overlay">
+    <div class="custom-alert-box">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="fw-bold text-primary fs-5"><i class="fa-solid fa-eye me-2"></i>Order Accounts Details</span>
+            <button onclick="closeOrderViewModal()" class="btn-close-custom"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="mb-3 text-sub small fw-semibold" id="order-view-meta"></div>
+        <div class="modal-account-data-box mb-4 user-select-all" id="order-view-accounts-box"></div>
+        <div class="d-flex gap-2">
+            <button onclick="copyOrderViewAccounts()" class="btn btn-outline-info w-50 rounded-pill fw-bold py-2.5"><i class="fa-solid fa-copy me-1"></i> Copy Details</button>
+            <button onclick="closeOrderViewModal()" class="btn btn-primary w-50 rounded-pill fw-bold py-2.5">Close</button>
+        </div>
+    </div>
+</div>
+
+<div id="success-result-modal" class="custom-alert-overlay">
+    <div class="custom-alert-box">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="fw-bold text-success fs-5"><i class="fa-solid fa-circle-check me-2"></i>Purchase Successful!</span>
+            <button onclick="closeSuccessModal()" class="btn-close-custom"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <p class="text-sub small mb-3">Here are your purchased account details (tap box or use copy button):</p>
+        <div class="modal-account-data-box mb-4 user-select-all" id="success-accounts-container"></div>
+        <div class="d-flex gap-2">
+            <button onclick="copyAllSuccessAccounts()" class="btn btn-outline-info w-50 rounded-pill fw-bold py-2.5"><i class="fa-solid fa-copy me-1"></i> Copy Details</button>
+            <button onclick="closeSuccessModal()" class="btn btn-success w-50 rounded-pill fw-bold py-2.5">Done</button>
+        </div>
+    </div>
+</div>
+
+<!-- DUAL SLIDING AUTH SECTION -->
+<div id="auth-section" class="auth-wrapper-body">
+    <div style="position: absolute; top: 15px; right: 20px; z-index: 1005;">
+        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+            <i class="fa-solid fa-moon" id="theme-icon-auth"></i>
+        </button>
+    </div>
+
+    <div class="auth-main-container" id="authMainContainer">
+        
+        <!-- SIGN UP FORM -->
+        <div class="auth-form-container auth-sign-up-container mobile-active" id="signUpFormContainer">
+            <form id="signupForm" onsubmit="handleAuthRegister(event)" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                    <div class="brand-logo-icon" style="width: 34px; height: 34px; font-size: 16px; border-radius: 10px;"><i class="fa-solid fa-store"></i></div>
+                    <span class="fw-bold fs-6 text-main">Mail Mart</span>
+                </div>
+                <h5 class="fw-bold mb-1 text-main">Create Account</h5>
+                <p class="text-sub small mb-3 text-center">Join us and manage your accounts seamlessly</p>
+                
+                <div class="auth-input-group">
+                    <i class="fa-solid fa-user field-icon"></i>
+                    <input type="text" id="su-name" placeholder="Full Name" required>
+                </div>
+
+                <div class="auth-input-group">
+                    <i class="fa-solid fa-at field-icon"></i>
+                    <input type="email" id="su-email" placeholder="Email (Only @gmail.com)" required>
+                </div>
+
+                <div class="auth-input-group">
+                    <i class="fa-solid fa-lock field-icon"></i>
+                    <input type="password" id="su-pass" placeholder="Password (Min 6 chars)" required>
+                    <i class="fa-solid fa-eye toggle-password" onclick="togglePasswordVisibility('su-pass', this)"></i>
+                </div>
+
+                <div class="auth-input-group">
+                    <i class="fa-solid fa-lock field-icon"></i>
+                    <input type="password" id="su-cpass" placeholder="Confirm Password" required>
+                    <i class="fa-solid fa-eye toggle-password" onclick="togglePasswordVisibility('su-cpass', this)"></i>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100 fw-bold py-2.5 rounded-pill shadow mt-3" style="font-size: 14px; background: linear-gradient(135deg, #6366f1, #a855f7); border: none;">Sign Up</button>
+                
+                <!-- Mobile Switch Link -->
+                <div class="mobile-switch-text">
+                    Already have an account? <a onclick="switchToSignInMobile()">Sign In</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- SIGN IN FORM -->
+        <div class="auth-form-container auth-sign-in-container" id="signInFormContainer">
+            <form id="signinForm" onsubmit="handleAuthLogin(event)" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                    <div class="brand-logo-icon" style="width: 34px; height: 34px; font-size: 16px; border-radius: 10px;"><i class="fa-solid fa-store"></i></div>
+                    <span class="fw-bold fs-6 text-main">Mail Mart</span>
+                </div>
+                <h5 class="fw-bold mb-1 text-main">Welcome Back</h5>
+                <p class="text-sub small mb-3 text-center">Please login with your personal info</p>
+
+                <div class="auth-input-group">
+                    <i class="fa-solid fa-at field-icon"></i>
+                    <input type="email" id="si-email" placeholder="Email (@gmail.com)" required>
+                </div>
+
+                <div class="auth-input-group">
+                    <i class="fa-solid fa-lock field-icon"></i>
+                    <input type="password" id="si-pass" placeholder="Password" required>
+                    <i class="fa-solid fa-eye toggle-password" onclick="togglePasswordVisibility('si-pass', this)"></i>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center w-100 mt-2 mb-3" style="font-size: 12px;">
+                    <label class="d-flex align-items-center gap-1 text-sub" style="cursor: pointer;">
+                        <input type="checkbox" id="rememberMe" style="accent-color: #6366f1;"> Remember me
+                    </label>
+                    <a href="#" onclick="triggerForgotPassword(event)" class="text-primary text-decoration-none fw-bold" style="color: #6366f1 !important;">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 fw-bold py-2.5 rounded-pill shadow" style="font-size: 14px; background: linear-gradient(135deg, #6366f1, #a855f7); border: none;">Sign In</button>
+                
+                <!-- Mobile Switch Link -->
+                <div class="mobile-switch-text">
+                    Haven't any account? <a onclick="switchToSignUpMobile()">Sign Up</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- SLIDING OVERLAY PANEL (For PC View) -->
+        <div class="auth-overlay-container">
+            <div class="auth-overlay">
+                <div class="auth-overlay-panel auth-overlay-left">
+                    <h3 class="fw-bold mb-2">Welcome Back!</h3>
+                    <p class="small mb-3">To keep connected with Mail Mart please login with your personal info</p>
+                    <button class="auth-ghost-btn" id="signInSlideBtn">Sign In</button>
+                </div>
+                <div class="auth-overlay-panel auth-overlay-right">
+                    <h3 class="fw-bold mb-2">Hello, Friend!</h3>
+                    <p class="small mb-3">Enter your personal details and start your journey with Mail Mart</p>
+                    <button class="auth-ghost-btn" id="signUpSlideBtn">Sign Up</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- USER PLATFORM PANEL -->
+<div id="user-panel-container" class="user-container">
+    <div class="top-header">
+        <div class="d-flex align-items-center gap-2">
+            <div class="brand-logo-icon" style="width: 36px; height: 36px; font-size: 16px; border-radius: 10px;"><i class="fa-solid fa-store"></i></div>
+            <span class="fw-bold fs-6">Mail Mart</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <div class="bg-success bg-opacity-10 border border-success border-opacity-25 px-3 py-1.5 rounded-pill">
+                <span class="fw-bold text-success" id="user-top-balance">৳0.00</span>
+            </div>
+            <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                <i class="fa-solid fa-moon" id="theme-icon"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div id="user-notification-banner-wrapper" style="display: none;" class="user-notification-banner">
+            <div class="d-flex align-items-start gap-3">
+                <div class="text-primary fs-4 mt-1"><i class="fa-solid fa-bullhorn"></i></div>
+                <div style="font-size: 14px;" class="text-main fw-semibold" id="user-notification-text"></div>
+            </div>
+            <button onclick="dismissUserNotification()" class="btn-close-custom text-sub"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div id="user-section-home" class="section-pane active">
+            <div class="shop-layout-container">
+                <div class="sidebar-categories">
+                    <h6>Categories</h6>
+                    <div id="main-categories-container" class="main-categories-wrapper"></div>
+                </div>
+                <div class="shop-content-area">
+                    <div class="shop-grid" id="user-shop-subcategories-grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="user-section-deposit" class="section-pane">
+            <div id="deposit-step-1" class="card-box">
+                <div class="p-3 rounded-3 bg-input border border-primary border-opacity-25 mb-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-sub" style="font-size: 11px; font-weight: 700;">MINIMUM DEPOSIT</div>
+                        <div class="fw-bold text-primary fs-5" id="min-deposit-text" style="color: #6366f1 !important;">৳20.00 BDT</div>
+                    </div>
+                    <div class="text-primary bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;"><i class="fa-solid fa-info"></i></div>
+                </div>
+                <div class="mb-3">
+                    <label class="small text-sub mb-1 fw-semibold" id="deposit-amount-label">Amount (BDT)</label>
+                    <div class="position-relative">
+                        <span class="position-absolute start-0 top-50 translate-middle-y ps-3 text-sub fw-bold" id="deposit-currency-symbol">৳</span>
+                        <input type="number" step="any" id="deposit-input-amount" class="form-control ps-5" placeholder="20" oninput="calculateBdtAmount()">
+                    </div>
+                    <div id="auto-bdt-show" class="text-info small fw-bold mt-2" style="display:none;"></div>
+                </div>
+                <div class="mb-4">
+                    <label class="small text-sub mb-2 fw-semibold">Select Payment Method</label>
+                    <div id="user-payment-methods-list" class="pay-method-grid"></div>
+                </div>
+                <button onclick="proceedToPaymentInstruction()" class="btn btn-primary w-100 fw-bold py-3 rounded-pill shadow" style="background: linear-gradient(135deg, #6366f1, #a855f7); border: none;">
+                    <i class="fa-solid fa-arrow-right me-2"></i>Continue to Payment
+                </button>
+            </div>
+
+            <div id="deposit-step-2" class="card-box" style="display: none;">
+                <div class="text-center mb-4">
+                    <div id="instruction-method-logo" class="pay-logo logo-default mx-auto mb-2" style="width: 60px; height: 60px; font-size: 18px;">MM</div>
+                    <h5 class="fw-bold m-0" id="instruction-method-title">Payment Instruction</h5>
+                </div>
+                <div class="p-3 rounded-3 bg-input border border-secondary border-opacity-25 mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-sub small">Enter Amount:</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fw-bold text-success fs-5" id="instruction-amount-display">৳0.00 BDT</span>
+                            <button onclick="copyDepositAmount()" class="btn btn-sm btn-outline-info py-0 px-2" style="font-size: 12px;" title="Copy Amount"><i class="fa-solid fa-copy"></i> Copy</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-column gap-3 mb-4" id="instruction-steps-box" style="font-size: 14px;"></div>
+                <div class="mb-4">
+                    <label class="small text-sub mb-1 fw-semibold" id="deposit-trx-label">Enter Transaction ID (TrxID) / Hash</label>
+                    <input type="text" id="deposit-trx-input" class="form-control" placeholder="e.g. 9N78XYZ123">
+                </div>
+                <div class="d-flex gap-2">
+                    <button onclick="backToDepositStep1()" class="btn btn-outline-secondary w-50 rounded-pill fw-bold py-2">Back</button>
+                    <button onclick="submitFinalDepositRequest()" class="btn btn-primary w-50 rounded-pill fw-bold py-2" style="background: linear-gradient(135deg, #6366f1, #a855f7); border: none;">Submit Request</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="user-section-history" class="section-pane">
+            <div class="alert alert-info bg-body border border-info border-opacity-50 d-flex align-items-center gap-3 mb-4 rounded-3 p-3 shadow-sm">
+                <i class="fa-solid fa-circle-info text-info fs-4 flex-shrink-0"></i>
+                <div style="font-size: 13px;">
+                    <strong>Notice:</strong> Purchased accounts are auto-removed after <strong>7 days</strong> and Deposit history after <strong>30 days</strong>.
+                </div>
+            </div>
+            <div class="card-box mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold m-0"><i class="fa-solid fa-bag-shopping text-primary me-2"></i>Purchased Accounts History</h5>
+                    <button onclick="copyAllOrders()" class="btn btn-sm btn-outline-info rounded-pill px-3"><i class="fa-solid fa-copy me-1"></i> Copy All</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered mb-0">
+                        <thead><tr><th>Order ID</th><th>Date</th><th>Product</th><th>Quantity</th><th>Total</th><th>Actions</th></tr></thead>
+                        <tbody id="user-orders-table-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-box">
+                <h5 class="fw-bold mb-3"><i class="fa-solid fa-wallet text-success me-2"></i>Deposit History</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered mb-0">
+                        <thead><tr><th>Method</th><th>Amount</th><th>TrxID</th><th>Status</th></tr></thead>
+                        <tbody id="user-deposit-history-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="user-section-profile" class="section-pane">
+            <div class="card-box">
+                <div class="text-center mb-4">
+                    <div class="position-relative d-inline-block mb-3">
+                        <img id="profile-avatar-img" src="" alt="Avatar" class="rounded-circle border border-2 border-primary shadow" style="width: 90px; height: 90px; object-fit: cover; border-color: #6366f1 !important;">
+                        <span class="position-absolute bottom-0 end-0 bg-success border border-dark rounded-circle" style="width: 18px; height: 18px;"></span>
+                    </div>
+                    <h5 class="fw-bold mb-1" id="profile-username-title">User Profile</h5>
+                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-1 rounded-pill" style="font-size: 11px; color: #6366f1 !important;">Customer Account</span>
+                </div>
+                <div class="d-flex flex-column gap-3 mb-4" style="font-size: 13px;">
+                    <div class="profile-info-card d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-sub" style="font-size: 11px;">Email Address</div>
+                            <div class="fw-bold" id="profile-email-text">-</div>
+                        </div>
+                        <i class="fa-solid fa-envelope text-primary opacity-50"></i>
+                    </div>
+                    <div class="profile-info-card d-flex justify-content-between align-items-center" style="cursor: pointer;" onclick="toggleProfilePassword()">
+                        <div>
+                            <div class="text-sub" style="font-size: 11px;">Password</div>
+                            <div class="fw-bold text-info font-monospace" id="profile-pass-display">••••••••</div>
+                        </div>
+                        <div class="text-primary d-flex align-items-center gap-1" style="font-size: 12px; color: #6366f1 !important;">
+                            <i class="fa-solid fa-eye" id="pass-eye-icon"></i><span id="pass-toggle-label">View</span>
+                        </div>
+                    </div>
+                    <div class="profile-info-card d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-sub" style="font-size: 11px;">Account Balance</div>
+                            <div class="fw-bold text-success fs-6" id="profile-balance-text">৳0.00</div>
+                        </div>
+                        <i class="fa-solid fa-wallet text-success opacity-50"></i>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button onclick="userLogout()" class="btn btn-outline-danger px-4 py-2 rounded-pill fw-bold shadow-sm" style="font-size: 13px;">
+                        <i class="fa-solid fa-right-from-bracket me-2"></i>Logout Account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="#" id="telegram-support-btn" target="_blank" class="telegram-float" title="Contact Support" style="display: none;">
+        <i class="fa-brands fa-telegram"></i>
+    </a>
+
+    <div class="bottom-nav">
+        <a href="#" onclick="switchUserTab('home')" class="active" id="user-menu-home"><i class="fa-solid fa-house"></i><span>Home</span></a>
+        <a href="#" onclick="switchUserTab('deposit')" id="user-menu-deposit"><i class="fa-solid fa-wallet"></i><span>Deposit</span></a>
+        <a href="#" onclick="switchUserTab('history')" id="user-menu-history"><i class="fa-solid fa-clock-rotate-left"></i><span>History</span></a>
+        <a href="#" onclick="switchUserTab('profile')" id="user-menu-profile"><i class="fa-solid fa-user"></i><span>Profile</span></a>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCvMV3iQcRlX0AaZMtL_VjEngyQtRhEdNY",
+        authDomain: "mailp-92874.firebaseapp.com",
+        databaseURL: "https://mailp-92874-default-rtdb.firebaseio.com",
+        projectId: "mailp-92874",
+        storageBucket: "mailp-92874.firebasestorage.app",
+        messagingSenderId: "540857867402",
+        appId: "1:540857867402:web:a80e0b3278e04f6da86173",
+        measurementId: "G-N2YM7QCPNY"
+    };
+
+    if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function toggleTheme() {
+        const root = document.documentElement;
+        const themeIcon = document.getElementById('theme-icon');
+        const themeIconAuth = document.getElementById('theme-icon-auth');
+        
+        if (root.classList.contains('dark-theme')) {
+            root.classList.replace('dark-theme', 'light-theme');
+            if(themeIcon) themeIcon.className = "fa-solid fa-sun";
+            if(themeIconAuth) themeIconAuth.className = "fa-solid fa-sun";
+            localStorage.setItem('mail_mart_theme', 'light');
+        } else {
+            root.classList.replace('light-theme', 'dark-theme');
+            if(themeIcon) themeIcon.className = "fa-solid fa-moon";
+            if(themeIconAuth) themeIconAuth.className = "fa-solid fa-moon";
+            localStorage.setItem('mail_mart_theme', 'dark');
+        }
+    }
+
+    const savedTheme = localStorage.getItem('mail_mart_theme') || 'dark';
+    if (savedTheme === 'light') {
+        document.documentElement.classList.replace('dark-theme', 'light-theme');
+        if(document.getElementById('theme-icon')) document.getElementById('theme-icon').className = "fa-solid fa-sun";
+        if(document.getElementById('theme-icon-auth')) document.getElementById('theme-icon-auth').className = "fa-solid fa-sun";
+    } else {
+        document.documentElement.classList.add('dark-theme');
+    }
+
+    const authMainContainer = document.getElementById('authMainContainer');
+    const signUpFormContainer = document.getElementById('signUpFormContainer');
+    const signInFormContainer = document.getElementById('signInFormContainer');
+
+    document.getElementById('signUpSlideBtn').addEventListener('click', () => {
+        authMainContainer.classList.add("right-panel-active");
+    });
+    document.getElementById('signInSlideBtn').addEventListener('click', () => {
+        authMainContainer.classList.remove("right-panel-active");
+    });
+
+    // Mobile View Toggle Helpers
+    function switchToSignUpMobile() {
+        signInFormContainer.classList.remove('mobile-active');
+        signUpFormContainer.classList.add('mobile-active');
+    }
+    function switchToSignInMobile() {
+        signUpFormContainer.classList.remove('mobile-active');
+        signInFormContainer.classList.add('mobile-active');
+    }
+
+    function togglePasswordVisibility(fieldId, icon) {
+        const field = document.getElementById(fieldId);
+        if (field.type === "password") {
+            field.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        } else {
+            field.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        }
+    }
+
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            showCustomAlert('Copied to clipboard: ' + text);
+        });
+    }
+
+    function copyDepositAmount() {
+        let amountText = document.getElementById('instruction-amount-display').innerText.trim();
+        navigator.clipboard.writeText(amountText).then(() => {
+            showCustomAlert('Copied amount: ' + amountText);
+        });
+    }
+
+    function getCategoryIcon(catName) {
+        let name = (catName || '').toLowerCase();
+        if (name.includes('hotmail') || name.includes('outlook') || name.includes('gmail') || name.includes('mail')) return '<i class="fa-solid fa-envelope"></i>';
+        if (name.includes('vpn') || name.includes('proxy')) return '<i class="fa-solid fa-shield-halved"></i>';
+        if (name.includes('telegram') || name.includes('social')) return '<i class="fa-brands fa-telegram"></i>';
+        return '<i class="fa-solid fa-folder-open"></i>';
+    }
+
+    let selectedMainCategory = null;
+    let selectedPaymentMethodData = null;
+    let actualUserPassword = '';
+    let isPasswordVisible = false;
+    let currentBinanceRate = 120;
+    let currentModalData = { categoryName: '', price: 0, stockCount: 0, isFake: false };
+
+    let cachedCategories = null;
+    let cachedStocks = null;
+    let cachedFakeStocks = null;
+
+    function preloadShopData() {
+        db.ref('categories').on('value', (catSnap) => {
+            cachedCategories = catSnap.val() || {};
+            if(document.getElementById('user-section-home').classList.contains('active')) renderUserShopUI();
+        });
+        db.ref('stocks').on('value', (stockSnap) => {
+            cachedStocks = stockSnap.val() || {};
+            if(document.getElementById('user-section-home').classList.contains('active')) renderUserShopUI();
+        });
+        db.ref('fakeStocks').on('value', (fakeSnap) => {
+            cachedFakeStocks = fakeSnap.val() || {};
+            if(document.getElementById('user-section-home').classList.contains('active')) renderUserShopUI();
+        });
+    }
+
+    function showCustomAlert(msg) {
+        document.getElementById('custom-alert-message').innerText = msg;
+        document.getElementById('custom-alert-overlay').style.display = 'flex';
+    }
+    function closeCustomAlert() { document.getElementById('custom-alert-overlay').style.display = 'none'; }
+    function closeSuccessModal() { document.getElementById('success-result-modal').style.display = 'none'; }
+    function copyAllSuccessAccounts() {
+        navigator.clipboard.writeText(document.getElementById('success-accounts-container').innerText).then(() => showCustomAlert('Copied successfully!'));
+    }
+    function closeOrderViewModal() { document.getElementById('order-view-modal').style.display = 'none'; }
+    function copyOrderViewAccounts() {
+        navigator.clipboard.writeText(document.getElementById('order-view-accounts-box').innerText).then(() => showCustomAlert('Copied successfully!'));
+    }
+
+    function openPurchaseModal(catName, price, stockCount, isFake) {
+        currentModalData = { categoryName: catName, price: price, stockCount: stockCount, isFake: isFake };
+        document.getElementById('modal-cat-name').innerText = catName;
+        document.getElementById('modal-unit-price').innerText = `৳${price}`;
+        document.getElementById('modal-stock-count').innerText = stockCount;
+        document.getElementById('modal-qty-input').value = 1;
+        document.getElementById('modal-error-banner').style.display = 'none';
+        updateModalTotalPrice(1);
+        document.getElementById('purchase-modal-overlay').style.display = 'flex';
+    }
+    function closePurchaseModal() { document.getElementById('purchase-modal-overlay').style.display = 'none'; }
+    function updateModalTotalPrice(qty) { document.getElementById('modal-total-price').innerText = `৳${(qty * currentModalData.price).toFixed(2)}`; }
+    function changeModalQty(change) {
+        let input = document.getElementById('modal-qty-input');
+        let newQty = (parseInt(input.value) || 0) + change;
+        if (newQty < 1) newQty = 1;
+        if (newQty > currentModalData.stockCount) newQty = currentModalData.stockCount;
+        input.value = newQty;
+        updateModalTotalPrice(newQty);
+    }
+    function onModalQtyTyped(input) {
+        if (input.value === '') { updateModalTotalPrice(0); return; }
+        let qty = parseInt(input.value);
+        if (qty > currentModalData.stockCount) { qty = currentModalData.stockCount; input.value = qty; }
+        updateModalTotalPrice(qty > 0 ? qty : 0);
+    }
+
+    function confirmAndBuy() {
+        let email = localStorage.getItem('apex_logged_user');
+        if (!email) return showCustomAlert('Please login first!');
+        let qty = parseInt(document.getElementById('modal-qty-input').value) || 1;
+        let safeKey = email.replace(/[@.]/g, '_');
+        let totalCost = parseFloat((qty * currentModalData.price).toFixed(2));
+        let errorBanner = document.getElementById('modal-error-banner');
+        errorBanner.style.display = 'none';
+
+        db.ref(`balances/${safeKey}`).once('value', (balSnap) => {
+            let currentBalance = parseFloat(balSnap.val() || 0);
+            if (currentBalance < totalCost) {
+                errorBanner.innerText = `Insufficient Balance! Required ৳${totalCost}, Balance ৳${currentBalance}.`;
+                errorBanner.style.display = 'block';
+                return;
+            }
+
+            if (currentModalData.isFake) {
+                closePurchaseModal();
+                const serverErrors = [
+                    "Server busy! Please try again later.",
+                    "Gateway timeout (504). Database connection temporarily lost.",
+                    "High traffic detected! Transaction queue is currently full.",
+                    "Database synchronization error. Please retry your purchase."
+                ];
+                let randomErr = serverErrors[Math.floor(Math.random() * serverErrors.length)];
+                showCustomAlert(randomErr);
+                return;
+            }
+
+            db.ref('stocks').once('value', (stockSnap) => {
+                let stocks = stockSnap.val() || {};
+                let availableKeys = Object.keys(stocks).filter(k => stocks[k].category === currentModalData.categoryName && stocks[k].status === 'available');
+                if (availableKeys.length < qty) {
+                    closePurchaseModal();
+                    showCustomAlert("Server busy or insufficient stock right now!");
+                    return;
+                }
+                let keysToBuy = availableKeys.slice(0, qty);
+                let purchasedAccounts = [];
+                let timestamp = Date.now();
+                let updates = {};
+                keysToBuy.forEach(k => {
+                    updates[`stocks/${k}/status`] = 'sold';
+                    updates[`stocks/${k}/soldTo`] = email;
+                    updates[`stocks/${k}/soldTimestamp`] = timestamp;
+                    purchasedAccounts.push(stocks[k].accountDetails);
+                });
+                updates[`balances/${safeKey}`] = parseFloat((currentBalance - totalCost).toFixed(2));
+
+                db.ref().update(updates).then(() => {
+                    let orderData = {
+                        orderId: '#' + Math.random().toString(36).substr(2, 6).toUpperCase(),
+                        user: email, category: currentModalData.categoryName, quantity: qty,
+                        totalPrice: totalCost, accounts: purchasedAccounts,
+                        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                        timestamp: timestamp
+                    };
+                    db.ref('orders').push(orderData).then(() => {
+                        closePurchaseModal();
+                        document.getElementById('success-accounts-container').innerText = purchasedAccounts.join('\n');
+                        document.getElementById('success-result-modal').style.display = 'flex';
+                        loadUserShop();
+                    });
+                });
+            });
+        });
+    }
+
+    window.onload = function() {
+        let loggedUser = localStorage.getItem('apex_logged_user');
+        if(loggedUser) {
+            showUserPanel(loggedUser);
+        } else {
+            showAuthSection();
+            const savedEmail = localStorage.getItem('mailMarketRememberedEmail');
+            if (savedEmail) {
+                document.getElementById('si-email').value = savedEmail;
+                document.getElementById('rememberMe').checked = true;
+            }
+        }
+        setupTelegramSupport();
+        fetchBinanceRate();
+        listenToUserNotifications();
+        preloadShopData();
+    };
+
+    function fetchBinanceRate() {
+        db.ref('settings/binanceRate').on('value', snap => {
+            if(snap.exists()) {
+                currentBinanceRate = parseFloat(snap.val()) || 120;
+                if(selectedPaymentMethodData) updateDepositUIForMethod(selectedPaymentMethodData.name);
+            }
+        });
+    }
+
+    function listenToUserNotifications() {
+        db.ref('settings/userNotification').on('value', snap => {
+            const val = snap.val();
+            const banner = document.getElementById('user-notification-banner-wrapper');
+            const txt = document.getElementById('user-notification-text');
+            if (val && val.trim() !== '') {
+                txt.innerText = val;
+                banner.style.display = 'flex';
+            } else {
+                banner.style.display = 'none';
+            }
+        });
+    }
+
+    function dismissUserNotification() {
+        document.getElementById('user-notification-banner-wrapper').style.display = 'none';
+    }
+
+    function updateDepositUIForMethod(methodName) {
+        let nameLower = (methodName || '').toLowerCase();
+        let minDepositLabel = document.getElementById('min-deposit-text');
+        let amountLabel = document.getElementById('deposit-amount-label');
+        let currencySymbol = document.getElementById('deposit-currency-symbol');
+        let amountInput = document.getElementById('deposit-input-amount');
+        document.getElementById('auto-bdt-show').style.display = 'none';
+        amountInput.value = '';
+
+        if (nameLower.includes('binance')) {
+            let minDepositInfo = (20 / currentBinanceRate).toFixed(2);
+            minDepositLabel.innerText = `${minDepositInfo} USD`;
+            amountLabel.innerText = "Amount (USD)";
+            currencySymbol.innerText = "$";
+            amountInput.placeholder = minDepositInfo;
+        } else {
+            minDepositLabel.innerText = "৳20.00 BDT";
+            amountLabel.innerText = "Amount (BDT)";
+            currencySymbol.innerText = "৳";
+            amountInput.placeholder = "20";
+        }
+    }
+
+    function calculateBdtAmount() {
+        let inputVal = parseFloat(document.getElementById('deposit-input-amount').value);
+        let showBox = document.getElementById('auto-bdt-show');
+        if (!selectedPaymentMethodData) return;
+        let nameLower = selectedPaymentMethodData.name.toLowerCase();
+        let isBinance = nameLower.includes('binance');
+
+        if (!isNaN(inputVal) && inputVal > 0) {
+            if (isBinance) {
+                showBox.innerText = `≈ ৳${(inputVal * currentBinanceRate).toFixed(2)} BDT (Rate: 1$ = ৳${currentBinanceRate})`;
+            } else {
+                showBox.innerText = `≈ $${(inputVal / currentBinanceRate).toFixed(2)} USD (Rate: 1$ = ৳${currentBinanceRate})`;
+            }
+            showBox.style.display = 'block';
+        } else { showBox.style.display = 'none'; }
+    }
+
+    function setupTelegramSupport() {
+        db.ref('settings/supportTelegram').on('value', (snap) => {
+            let supportVal = snap.val();
+            let tgBtn = document.getElementById('telegram-support-btn');
+            if (supportVal && tgBtn) {
+                let link = supportVal.trim();
+                if (!link.startsWith('http')) link = `https://t.me/${link.replace('@', '')}`;
+                tgBtn.href = link;
+                tgBtn.style.display = 'flex';
+            } else if (tgBtn) tgBtn.style.display = 'none';
+        });
+    }
+
+    function showAuthSection() {
+        document.getElementById('auth-section').style.display = 'flex';
+        document.getElementById('user-panel-container').style.display = 'none';
+    }
+
+    function handleAuthRegister(e) {
+        e.preventDefault();
+        let name = document.getElementById('su-name').value.trim();
+        let emailInput = document.getElementById('su-email').value.trim().toLowerCase();
+        let pass = document.getElementById('su-pass').value;
+        let passConfirm = document.getElementById('su-cpass').value;
+
+        if(!emailInput.endsWith('@gmail.com')) {
+            showCustomAlert('Only valid @gmail.com accounts are accepted!');
+            return;
+        }
+        if(pass.length < 6) {
+            showCustomAlert('Password must be at least 6 characters long!');
+            return;
+        }
+        if(pass !== passConfirm) {
+            showCustomAlert('Passwords do not match!');
+            return;
+        }
+
+        let safeKey = emailInput.replace(/[@.]/g, '_');
+        let currentDate = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        let nowTimestamp = Date.now();
+
+        db.ref(`users/${safeKey}`).once('value', (snap) => {
+            if(snap.exists()) {
+                showCustomAlert('This Gmail account already exists!');
+            } else {
+                db.ref(`users/${safeKey}`).set({ name: name, email: emailInput, pass: pass, memberSince: currentDate, lastLogin: nowTimestamp });
+                db.ref(`balances/${safeKey}`).set(0);
+                showCustomAlert('Registration successful! You can now sign in.');
+                document.getElementById('signupForm').reset();
+                authMainContainer.classList.remove("right-panel-active");
+                switchToSignInMobile();
+            }
+        });
+    }
+
+    function handleAuthLogin(e) {
+        e.preventDefault();
+        let emailInput = document.getElementById('si-email').value.trim().toLowerCase();
+        let pass = document.getElementById('si-pass').value;
+        let rememberMe = document.getElementById('rememberMe').checked;
+
+        if(!emailInput.endsWith('@gmail.com')) {
+            showCustomAlert('Please enter a valid @gmail.com address!');
+            return;
+        }
+
+        let safeKey = emailInput.replace(/[@.]/g, '_');
+        db.ref(`users/${safeKey}`).once('value', (snap) => {
+            if(!snap.exists()) {
+                showCustomAlert('Account not found with this Gmail!');
+            } else {
+                let uData = snap.val();
+                if(uData.pass === pass) {
+                    db.ref(`users/${safeKey}/lastLogin`).set(Date.now());
+                    localStorage.setItem('apex_logged_user', emailInput);
+
+                    if (rememberMe) {
+                        localStorage.setItem('mailMarketRememberedEmail', emailInput);
+                    } else {
+                        localStorage.removeItem('mailMarketRememberedEmail');
+                    }
+
+                    showUserPanel(emailInput);
+                } else {
+                    showCustomAlert('Incorrect password!');
+                }
+            }
+        });
+    }
+
+    function triggerForgotPassword(e) {
+        e.preventDefault();
+        let emailInput = prompt("Enter your registered @gmail.com address for password recovery:");
+        if (emailInput) {
+            let cleanedEmail = emailInput.trim().toLowerCase();
+            let safeKey = cleanedEmail.replace(/[@.]/g, '_');
+            db.ref(`users/${safeKey}`).once('value', (snap) => {
+                if (snap.exists()) {
+                    let u = snap.val();
+                    alert(`Account found! Password: ${u.pass}`);
+                } else {
+                    alert("No account found matching this Gmail address.");
+                }
+            });
+        }
+    }
+
+    function userLogout() { 
+        localStorage.removeItem('apex_logged_user'); 
+        location.reload(); 
+    }
+
+    function showUserPanel(email) {
+        document.getElementById('auth-section').style.display = 'none';
+        document.getElementById('user-panel-container').style.display = 'block';
+        let safeKey = email.replace(/[@.]/g, '_');
+        document.getElementById('profile-avatar-img').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(email)}`;
+        let uname = email.split('@')[0];
+        document.getElementById('profile-username-title').innerText = uname.charAt(0).toUpperCase() + uname.slice(1);
+
+        db.ref(`users/${safeKey}`).once('value', (snap) => {
+            if(snap.exists()) {
+                let u = snap.val();
+                document.getElementById('profile-email-text').innerText = u.email;
+                actualUserPassword = u.pass;
+            }
+        });
+        switchUserTab('home');
+        loadUserBalance(email);
+    }
+
+    function loadUserBalance(email) {
+        db.ref(`balances/${email.replace(/[@.]/g, '_')}`).on('value', (snap) => {
+            let bal = snap.val() || 0;
+            document.getElementById('user-top-balance').innerText = `৳${bal}`;
+            document.getElementById('profile-balance-text').innerText = `৳${bal}`;
+        });
+    }
+
+    function toggleProfilePassword() {
+        isPasswordVisible = !isPasswordVisible;
+        document.getElementById('profile-pass-display').innerText = isPasswordVisible ? actualUserPassword : "••••••••";
+        document.getElementById('pass-eye-icon').className = isPasswordVisible ? "fa-solid fa-eye-slash" : "fa-solid fa-eye";
+        document.getElementById('pass-toggle-label').innerText = isPasswordVisible ? "Hide" : "View";
+    }
+
+    function switchUserTab(tab) {
+        document.querySelectorAll('.section-pane').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.bottom-nav a').forEach(el => el.classList.remove('active'));
+        document.getElementById(`user-section-${tab}`).classList.add('active');
+        document.getElementById(`user-menu-${tab}`).classList.add('active');
+
+        if(tab === 'home') loadUserShop();
+        if(tab === 'deposit') {
+            document.getElementById('deposit-step-1').style.display = 'flex';
+            document.getElementById('deposit-step-2').style.display = 'none';
+            loadUserPaymentMethods();
+        }
+        if(tab === 'history') { loadUserOrders(); loadUserDepositHistory(); }
+    }
+
+    function loadUserShop() {
+        if (cachedCategories && cachedStocks) {
+            renderUserShopUI();
+        } else {
+            db.ref('categories').once('value', (catSnap) => {
+                cachedCategories = catSnap.val() || {};
+                db.ref('stocks').once('value', (stockSnap) => {
+                    cachedStocks = stockSnap.val() || {};
+                    db.ref('fakeStocks').once('value', (fakeSnap) => {
+                        cachedFakeStocks = fakeSnap.val() || {};
+                        renderUserShopUI();
+                    });
+                });
+            });
+        }
+    }
+
+    function renderUserShopUI() {
+        let cats = cachedCategories || {};
+        let stocks = cachedStocks || {};
+        let fakeStocks = cachedFakeStocks || {};
+
+        let mainCatsSet = new Set(), catList = [];
+        Object.keys(cats).forEach(ckey => {
+            let c = cats[ckey];
+            if(c.status === 'ON') { mainCatsSet.add(c.cat); catList.push({ key: ckey, ...c }); }
+        });
+        let mainCats = Array.from(mainCatsSet);
+        let container = document.getElementById('main-categories-container');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        if(mainCats.length === 0) {
+            container.innerHTML = `<div class="text-sub small p-2">No categories.</div>`;
+            document.getElementById('user-shop-subcategories-grid').innerHTML = '';
+            return;
+        }
+        if(!selectedMainCategory || !mainCats.includes(selectedMainCategory)) selectedMainCategory = mainCats[0];
+
+        mainCats.forEach(mCat => {
+            container.innerHTML += `<button class="main-category-pill ${mCat === selectedMainCategory ? 'active' : ''}" onclick="selectMainCategory('${mCat}')">${getCategoryIcon(mCat)} <span>${escapeHtml(mCat)}</span></button>`;
+        });
+
+        let grid = document.getElementById('user-shop-subcategories-grid');
+        grid.innerHTML = '';
+        
+        let filteredCats = catList.filter(c => c.cat === selectedMainCategory);
+        filteredCats.forEach((c) => {
+            let catString = `${c.cat} - ${c.subCat}`;
+            let realAvailableStocks = Object.values(stocks).filter(s => s.category === catString && s.status === 'available');
+            
+            let categoryFakeCount = 0;
+            let fakePrice = 0;
+            Object.values(fakeStocks).forEach(fs => {
+                if (fs.category === catString) {
+                    categoryFakeCount += parseInt(fs.fakeCount || 0);
+                    if(fakePrice === 0) fakePrice = parseFloat(fs.price || 0);
+                }
+            });
+
+            let stockCount = realAvailableStocks.length + categoryFakeCount;
+            let price = realAvailableStocks.length > 0 ? (realAvailableStocks[0].price || 0) : (fakePrice > 0 ? fakePrice : 0);
+            let isFakeItem = realAvailableStocks.length === 0 && categoryFakeCount > 0;
+
+            let actionBtnHtml = stockCount > 0 
+                ? `<button onclick="event.stopPropagation(); openPurchaseModal('${catString}', ${price}, ${stockCount}, ${isFakeItem})" class="buy-now-btn"><i class="fa-solid fa-cart-shopping"></i> Buy Now</button>`
+                : `<button class="btn btn-secondary fw-bold rounded-3 py-2.5 w-100 opacity-50" disabled>Stock Out</button>`;
+
+            grid.innerHTML += `
+                <div class="shop-item-card">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="fw-bold mb-0" style="font-size: 18px; color: var(--text-main);">${escapeHtml(c.subCat)}</h5>
+                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2.5 py-1 rounded-pill" style="font-size: 11px;">${escapeHtml(c.cat)}</span>
+                        </div>
+                        <div class="price-wrapper">
+                            <span class="fs-2 animated-price">৳${price}</span>
+                            <span class="text-sub" style="font-size: 13px;"> / account</span>
+                        </div>
+                        ${c.description ? `<div class="item-description">${escapeHtml(c.description)}</div>` : ''}
+                    </div>
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-3 pt-2 border-top border-secondary border-opacity-10">
+                            <span class="text-sub" style="font-size: 13px;">Availability:</span>
+                            <span class="stock-tag ${stockCount > 0 ? 'available' : 'out'}"><i class="fa-solid fa-${stockCount > 0 ? 'circle-check' : 'circle-xmark'}"></i> ${stockCount > 0 ? stockCount + ' available' : 'Out of stock'}</span>
+                        </div>
+                        ${actionBtnHtml}
+                    </div>
+                </div>`;
+        });
+    }
+
+    function selectMainCategory(catName) { selectedMainCategory = catName; renderUserShopUI(); }
+
+    function loadUserPaymentMethods() {
+        db.ref('paymentMethods').once('value', (snap) => {
+            let methods = snap.val() || {};
+            let container = document.getElementById('user-payment-methods-list');
+            container.innerHTML = '';
+            let keys = Object.keys(methods);
+            if(keys.length === 0) { container.innerHTML = `<div class="text-sub small">No payment methods available.</div>`; selectedPaymentMethodData = null; return; }
+
+            keys.forEach((k, idx) => {
+                let m = methods[k], nameLower = (m.name || '').toLowerCase();
+                let logoClass = 'logo-default', shortText = m.name.substring(0, 3).toUpperCase();
+                let logoHtml = '';
+
+                if (m.logo && m.logo.trim() !== '' && m.logo.trim().toLowerCase() !== 'no logo') {
+                    logoHtml = `<img src="${escapeHtml(m.logo.trim())}" alt="${escapeHtml(m.name)}" onerror="this.onerror=null; this.parentElement.innerHTML='${escapeHtml(shortText)}';">`;
+                } else {
+                    if(nameLower.includes('bkash')) { logoClass = 'logo-bkash'; shortText = 'bKash'; }
+                    else if(nameLower.includes('nagad')) { logoClass = 'logo-nagad'; shortText = 'Nagad'; }
+                    else if(nameLower.includes('rocket')) { logoClass = 'logo-rocket'; shortText = 'Rocket'; }
+                    else if(nameLower.includes('binance')) { logoClass = 'logo-binance'; shortText = 'BIN'; }
+                    else if(nameLower.includes('upay')) { logoClass = 'logo-upay'; shortText = 'Upay'; }
+                    logoHtml = shortText;
+                }
+
+                if(idx === 0) { selectedPaymentMethodData = m; updateDepositUIForMethod(m.name); }
+                container.innerHTML += `
+                    <div class="pay-method-card ${idx === 0 ? 'selected' : ''}" onclick="selectPaymentMethodItem(this, '${escapeHtml(m.name)}', '${escapeHtml(m.type)}', '${escapeHtml(m.number)}', '${escapeHtml(m.logo || '')}')">
+                        <div class="pay-logo ${logoClass}">${logoHtml}</div>
+                        <div class="fw-bold text-main" style="font-size: 13px;">${escapeHtml(m.name)}</div>
+                        <div class="text-sub" style="font-size: 10px;">${escapeHtml(m.type)}</div>
+                    </div>`;
+            });
+        });
+    }
+
+    function selectPaymentMethodItem(cardElement, name, type, number, logoUrl) {
+        document.querySelectorAll('.pay-method-card').forEach(el => el.classList.remove('selected'));
+        cardElement.classList.add('selected');
+        selectedPaymentMethodData = { name, type, number, logo: logoUrl };
+        updateDepositUIForMethod(name);
+    }
+
+    function proceedToPaymentInstruction() {
+        let inputVal = parseFloat(document.getElementById('deposit-input-amount').value);
+        if(!selectedPaymentMethodData) return showCustomAlert('Select payment method!');
+        
+        let nameLower = selectedPaymentMethodData.name.toLowerCase();
+        let isBinance = nameLower.includes('binance');
+        let minLimit = isBinance ? (20 / currentBinanceRate) : 20;
+
+        if(isNaN(inputVal) || inputVal < minLimit) {
+            return showCustomAlert('Invalid or less than minimum deposit amount!');
+        }
+
+        document.getElementById('deposit-step-1').style.display = 'none';
+        document.getElementById('deposit-step-2').style.display = 'flex';
+        document.getElementById('instruction-method-title').innerText = `Pay via ${selectedPaymentMethodData.name} (${selectedPaymentMethodData.type})`;
+
+        let logoContainer = document.getElementById('instruction-method-logo');
+        let shortText = selectedPaymentMethodData.name.substring(0, 3).toUpperCase();
+        let logoClass = 'logo-default';
+        if (nameLower.includes('bkash')) { logoClass = 'logo-bkash'; shortText = 'bKash'; }
+        else if (nameLower.includes('nagad')) { logoClass = 'logo-nagad'; shortText = 'Nagad'; }
+        else if (nameLower.includes('rocket')) { logoClass = 'logo-rocket'; shortText = 'Rocket'; }
+        else if (nameLower.includes('binance')) { logoClass = 'logo-binance'; shortText = 'BIN'; }
+        else if (nameLower.includes('upay')) { logoClass = 'logo-upay'; shortText = 'Upay'; }
+
+        logoContainer.className = `pay-logo ${logoClass} mx-auto mb-2`;
+        if (selectedPaymentMethodData.logo && selectedPaymentMethodData.logo.trim() !== '' && selectedPaymentMethodData.logo.trim().toLowerCase() !== 'no logo') {
+            logoContainer.innerHTML = `<img src="${escapeHtml(selectedPaymentMethodData.logo.trim())}" alt="${escapeHtml(selectedPaymentMethodData.name)}" onerror="this.onerror=null; this.parentElement.innerHTML='${escapeHtml(shortText)}';">`;
+        } else {
+            logoContainer.innerHTML = shortText;
+        }
+
+        let stepsHtml = '';
+        let trxLabelText = "Enter Transaction ID (TrxID) / Hash";
+        let targetNum = escapeHtml(selectedPaymentMethodData.number);
+        let copyBtnHtml = `<button onclick="copyToClipboard('${targetNum}')" class="btn btn-sm btn-outline-warning ms-2 py-0 px-2" style="font-size: 12px;"><i class="fa-solid fa-copy"></i> Copy</button>`;
+
+        if (isBinance) {
+            let equivalentBdt = Math.round(inputVal * currentBinanceRate);
+            document.getElementById('instruction-amount-display').innerText = `$${inputVal} USD (≈ ৳${equivalentBdt} BDT)`;
+            trxLabelText = "Enter Order ID / Hash";
+            stepsHtml = `
+                <div class="p-2.5 rounded bg-input text-main">1. Open Binance App -> Pay -> Send to Binance ID.</div>
+                <div class="p-2.5 rounded bg-input text-main d-flex justify-content-between align-items-center"><span>2. Binance ID: <strong class="text-primary">${targetNum}</strong></span> ${copyBtnHtml}</div>
+                <div class="p-2.5 rounded bg-input text-main">3. Enter Amount: <strong>$${inputVal} USD</strong></div>
+                <div class="p-2.5 rounded bg-input text-main">4. Complete the payment and copy the Order ID.</div>`;
+        } else {
+            document.getElementById('instruction-amount-display').innerText = `৳${inputVal} BDT`;
+            if (nameLower.includes('bkash')) {
+                stepsHtml = `
+                    <div class="p-2.5 rounded bg-input text-main">1. Dial <strong>*247#</strong> or open your <strong>bKash</strong> app.</div>
+                    <div class="p-2.5 rounded bg-input text-main">2. Choose: <strong>Send Money</strong></div>
+                    <div class="p-2.5 rounded bg-input text-main d-flex justify-content-between align-items-center"><span>3. Number: <strong class="text-primary">${targetNum}</strong></span> ${copyBtnHtml}</div>
+                    <div class="p-2.5 rounded bg-input text-main">4. Enter Amount: <strong>৳${inputVal} BDT</strong></div>
+                    <div class="p-2.5 rounded bg-input text-main">5. Now enter your <strong>bKash PIN</strong> to confirm.</div>`;
+            } else if (nameLower.includes('nagad')) {
+                stepsHtml = `
+                    <div class="p-2.5 rounded bg-input text-main">1. Dial <strong>*167#</strong> or open your <strong>Nagad</strong> app.</div>
+                    <div class="p-2.5 rounded bg-input text-main">2. Choose: <strong>Send Money</strong></div>
+                    <div class="p-2.5 rounded bg-input text-main d-flex justify-content-between align-items-center"><span>3. Number: <strong class="text-primary">${targetNum}</strong></span> ${copyBtnHtml}</div>
+                    <div class="p-2.5 rounded bg-input text-main">4. Enter Amount: <strong>৳${inputVal} BDT</strong></div>
+                    <div class="p-2.5 rounded bg-input text-main">5. Now enter your <strong>Nagad PIN</strong> to confirm.</div>`;
+            } else if (nameLower.includes('rocket')) {
+                stepsHtml = `
+                    <div class="p-2.5 rounded bg-input text-main">1. Dial <strong>*322#</strong> or open your <strong>Rocket</strong> app.</div>
+                    <div class="p-2.5 rounded bg-input text-main">2. Choose: <strong>Send Money</strong></div>
+                    <div class="p-2.5 rounded bg-input text-main d-flex justify-content-between align-items-center"><span>3. Number: <strong class="text-primary">${targetNum}</strong></span> ${copyBtnHtml}</div>
+                    <div class="p-2.5 rounded bg-input text-main">4. Enter Amount: <strong>৳${inputVal} BDT</strong></div>
+                    <div class="p-2.5 rounded bg-input text-main">5. Now enter your <strong>Rocket PIN</strong> to confirm.</div>`;
+            } else {
+                stepsHtml = `
+                    <div class="p-2.5 rounded bg-input text-main d-flex justify-content-between align-items-center"><span>1. Send to: <strong class="text-primary">${targetNum}</strong></span> ${copyBtnHtml}</div>
+                    <div class="p-2.5 rounded bg-input text-main">2. Type: <strong>${escapeHtml(selectedPaymentMethodData.type)}</strong></div>
+                    <div class="p-2.5 rounded bg-input text-main">3. Amount: <strong>৳${inputVal} BDT</strong></div>`;
+            }
+        }
+
+        document.getElementById('instruction-steps-box').innerHTML = stepsHtml;
+        document.getElementById('deposit-trx-label').innerText = trxLabelText;
+    }
+
+    function backToDepositStep1() {
+        document.getElementById('deposit-step-2').style.display = 'none';
+        document.getElementById('deposit-step-1').style.display = 'flex';
+    }
+
+    function submitFinalDepositRequest() {
+        let email = localStorage.getItem('apex_logged_user');
+        let trx = document.getElementById('deposit-trx-input').value.trim();
+        let inputVal = parseFloat(document.getElementById('deposit-input-amount').value);
+        
+        if(!trx) return showCustomAlert('Enter Transaction ID or Order ID!');
+        if(isNaN(inputVal) || inputVal <= 0) return showCustomAlert('Enter a valid amount!');
+
+        let submitBtn = event.target;
+        submitBtn.disabled = true;
+
+        db.ref('deposits').orderByChild('trx').equalTo(trx).once('value', (snapshot) => {
+            if (snapshot.exists()) {
+                submitBtn.disabled = false;
+                showCustomAlert('This Transaction ID has already been used! Duplicate TrxID is not allowed.');
+                return;
+            }
+
+            let nameLower = selectedPaymentMethodData.name.toLowerCase();
+            let isBinance = nameLower.includes('binance');
+            let finalAmount = isBinance ? (inputVal * currentBinanceRate) : inputVal;
+
+            db.ref('deposits').push({
+                email: email, method: selectedPaymentMethodData.name, amount: finalAmount, 
+                trx: trx, status: 'Pending', timestamp: Date.now()
+            }).then(() => {
+                submitBtn.disabled = false;
+                showCustomAlert('Deposit request submitted successfully!');
+                document.getElementById('deposit-trx-input').value = '';
+                switchUserTab('history');
+            }).catch(() => {
+                submitBtn.disabled,submitBtn.disabled = false;
+                showCustomAlert('Something went wrong. Please try again.');
+            });
+        });
+    }
+
+    function loadUserOrders() {
+        let email = localStorage.getItem('apex_logged_user');
+        db.ref('orders').orderByChild('user').equalTo(email).once('value', (snap) => {
+            let tbody = document.getElementById('user-orders-table-tbody');
+            tbody.innerHTML = '';
+            let data = snap.val() || {};
+            let keys = Object.keys(data);
+            if(keys.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="text-center text-sub py-3">No purchased orders found</td></tr>`; return; }
+
+            keys.reverse().forEach(k => {
+                let o = data[k];
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td><code>${escapeHtml(o.orderId)}</code></td>
+                        <td>${escapeHtml(o.date)}</td>
+                        <td>${escapeHtml(o.category)}</td>
+                        <td>${o.quantity}</td>
+                        <td>৳${o.totalPrice}</td>
+                        <td><button class="btn btn-sm btn-outline-info rounded-pill px-3" onclick='viewOrderAccounts(${JSON.stringify(o.accounts)})'><i class="fa-solid fa-eye me-1"></i> View</button></td>
+                    </tr>`);
+            });
+        });
+    }
+
+    function viewOrderAccounts(accountsArray) {
+        document.getElementById('order-view-accounts-box').innerText = accountsArray.join('\n');
+        document.getElementById('order-view-modal').style.display = 'flex';
+    }
+
+    function loadUserDepositHistory() {
+        let email = localStorage.getItem('apex_logged_user');
+        db.ref('deposits').orderByChild('email').equalTo(email).once('value', (snap) => {
+            let tbody = document.getElementById('user-deposit-history-tbody');
+            tbody.innerHTML = ``;
+            let data = snap.val() || {};
+            let keys = Object.keys(data);
+            if(keys.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="text-center text-sub py-3">No deposit history found</td></tr>`; return; }
+
+            keys.reverse().forEach(k => {
+                let d = data[k];
+                let statusBadge = d.status === 'Approved' ? '<span class="text-success fw-bold">Approved</span>' : (d.status === 'Rejected' ? '<span class="text-danger fw-bold">Rejected</span>' : '<span class="text-warning fw-bold">Pending</span>');
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${escapeHtml(d.method)}</td>
+                        <td>৳${d.amount}</td>
+                        <td><code>${escapeHtml(d.trx)}</code></td>
+                        <td>${statusBadge}</td>
+                    </tr>`);
+            });
+        });
+    }
+</script>
+</body>
+</html>
