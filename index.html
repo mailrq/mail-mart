@@ -46,7 +46,7 @@
             transition: background 0.3s, color 0.3s;
         }
 
-        /* Theme Toggle Top Button (Fixed overlap and layout positioning) */
+        /* Theme Toggle Top Button */
         .theme-toggle-btn {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -80,20 +80,20 @@
             box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
         }
 
-        /* Fixed Dual Sliding Auth Panel Styles */
+        /* --- PERFECT RESPONSIVE DUAL SLIDING AUTH PANEL --- */
         .auth-wrapper-body {
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 16px;
         }
 
         .auth-main-container {
             position: relative;
-            width: 880px;
+            width: 900px;
             max-width: 100%;
-            min-height: 620px;
+            min-height: 580px;
             background: var(--card-bg);
             backdrop-filter: blur(16px);
             border: 1px solid var(--border-color);
@@ -111,7 +111,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 30px 40px;
+            padding: 30px;
             width: 50%;
             overflow-y: auto;
         }
@@ -154,6 +154,20 @@
             background-color: transparent; border: 2px solid #fff; border-radius: 12px; color: #fff; font-size: 13px; font-weight: 600; padding: 10px 30px; text-transform: uppercase; cursor: pointer; transition: 0.3s; margin-top: 15px;
         }
         .auth-ghost-btn:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05); }
+
+        /* Mobile Responsive Fix for Auth Layout (Stacked instead of slider on small screens) */
+        @media (max-width: 768px) {
+            .auth-wrapper-body { padding: 10px; align-items: flex-start; padding-top: 20px; }
+            .auth-main-container { width: 100%; min-height: auto; border-radius: 20px; overflow: visible; display: flex; flex-direction: column; }
+            .auth-overlay-container { display: none !important; }
+            .auth-form-container { position: relative !important; width: 100% !important; height: auto !important; padding: 24px 18px !important; transform: none !important; opacity: 1 !important; pointer-events: auto !important; display: none; }
+            .auth-form-container.mobile-active { display: flex !important; }
+            .mobile-switch-text { display: block !important; text-align: center; margin-top: 15px; font-size: 13px; color: var(--text-sub); }
+            .mobile-switch-text a { color: #6366f1; font-weight: 700; text-decoration: none; cursor: pointer; }
+        }
+        @media (min-width: 769px) {
+            .mobile-switch-text { display: none !important; }
+        }
 
         .user-container { display: none; }
 
@@ -256,7 +270,6 @@
             box-shadow: 0 15px 35px var(--shadow-color); display: flex; flex-direction: column; justify-content: space-between; 
         }
 
-        /* Modernized Product Card & Confirm Buy Look */
         .shop-item-card {
             background: var(--card-bg);
             backdrop-filter: blur(16px);
@@ -274,23 +287,16 @@
         .shop-item-card::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(168, 85, 247, 0.05));
-            opacity: 0;
-            transition: opacity 0.35s ease;
-            pointer-events: none;
+            opacity: 0; transition: opacity 0.35s ease; pointer-events: none;
         }
         .shop-item-card:hover {
             border-color: rgba(99, 102, 241, 0.4);
             box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
             transform: translateY(-6px);
         }
-        .shop-item-card:hover::after {
-            opacity: 1;
-        }
+        .shop-item-card:hover::after { opacity: 1; }
 
         .buy-now-btn {
             color: #ffffff; font-weight: 700; border-radius: 14px; padding: 12px 18px; width: 100%; border: none; 
@@ -300,10 +306,7 @@
             box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
             transition: 0.3s;
         }
-        .buy-now-btn:hover { 
-            transform: scale(1.03); 
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5); 
-        }
+        .buy-now-btn:hover { transform: scale(1.03); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5); }
 
         .animated-price { color: #6366f1 !important; font-weight: 800; }
         .price-wrapper { display: flex; align-items: baseline; gap: 4px; margin-top: 6px; margin-bottom: 14px; }
@@ -360,8 +363,7 @@
         .modal-display-box { background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px; color: var(--text-main); }
         .modal-account-data-box {
             background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px; font-family: monospace; color: #10b981; font-size: 13px; line-height: 1.6; max-height: 220px; overflow-y: auto; white-space: pre-wrap; word-break: break-all;
-            user-select: all !important;
-            -webkit-user-select: all !important;
+            user-select: all !important; -webkit-user-select: all !important;
         }
         .item-description { color: var(--text-sub); font-size: 13px; margin-bottom: 12px; white-space: pre-wrap; line-height: 1.5; }
 
@@ -376,8 +378,7 @@
             background: rgba(99, 102, 241, 0.1);
             border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 20px; padding: 18px 24px; margin-bottom: 24px;
             display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; box-shadow: 0 8px 30px var(--shadow-color);
-            backdrop-filter: blur(12px);
-            word-break: break-word;
+            backdrop-filter: blur(12px); word-break: break-word;
         }
         
         .notice-modal-content {
@@ -405,7 +406,7 @@
     </div>
 </div>
 
-<!-- Confirm Buy Modal Redesigned -->
+<!-- Confirm Buy Modal -->
 <div id="purchase-modal-overlay" class="custom-alert-overlay">
     <div class="custom-alert-box position-relative">
         <div id="modal-error-banner" class="alert alert-danger py-2 px-3 mb-3 text-center fw-bold shadow-sm" style="display: none; font-size: 13px; border-radius: 12px;"></div>
@@ -489,7 +490,7 @@
     <div class="auth-main-container" id="authMainContainer">
         
         <!-- SIGN UP FORM -->
-        <div class="auth-form-container auth-sign-up-container">
+        <div class="auth-form-container auth-sign-up-container mobile-active" id="signUpFormContainer">
             <form id="signupForm" onsubmit="handleAuthRegister(event)" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
                 <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
                     <div class="brand-logo-icon" style="width: 34px; height: 34px; font-size: 16px; border-radius: 10px;"><i class="fa-solid fa-store"></i></div>
@@ -521,11 +522,16 @@
                 </div>
                 
                 <button type="submit" class="btn btn-primary w-100 fw-bold py-2.5 rounded-pill shadow mt-3" style="font-size: 14px; background: linear-gradient(135deg, #6366f1, #a855f7); border: none;">Sign Up</button>
+                
+                <!-- Mobile Switch Link -->
+                <div class="mobile-switch-text">
+                    Already have an account? <a onclick="switchToSignInMobile()">Sign In</a>
+                </div>
             </form>
         </div>
 
         <!-- SIGN IN FORM -->
-        <div class="auth-form-container auth-sign-in-container">
+        <div class="auth-form-container auth-sign-in-container" id="signInFormContainer">
             <form id="signinForm" onsubmit="handleAuthLogin(event)" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
                 <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
                     <div class="brand-logo-icon" style="width: 34px; height: 34px; font-size: 16px; border-radius: 10px;"><i class="fa-solid fa-store"></i></div>
@@ -553,10 +559,15 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100 fw-bold py-2.5 rounded-pill shadow" style="font-size: 14px; background: linear-gradient(135deg, #6366f1, #a855f7); border: none;">Sign In</button>
+                
+                <!-- Mobile Switch Link -->
+                <div class="mobile-switch-text">
+                    Haven't any account? <a onclick="switchToSignUpMobile()">Sign Up</a>
+                </div>
             </form>
         </div>
 
-        <!-- SLIDING OVERLAY PANEL -->
+        <!-- SLIDING OVERLAY PANEL (For PC View) -->
         <div class="auth-overlay-container">
             <div class="auth-overlay">
                 <div class="auth-overlay-panel auth-overlay-left">
@@ -798,12 +809,25 @@
     }
 
     const authMainContainer = document.getElementById('authMainContainer');
+    const signUpFormContainer = document.getElementById('signUpFormContainer');
+    const signInFormContainer = document.getElementById('signInFormContainer');
+
     document.getElementById('signUpSlideBtn').addEventListener('click', () => {
         authMainContainer.classList.add("right-panel-active");
     });
     document.getElementById('signInSlideBtn').addEventListener('click', () => {
         authMainContainer.classList.remove("right-panel-active");
     });
+
+    // Mobile View Toggle Helpers
+    function switchToSignUpMobile() {
+        signInFormContainer.classList.remove('mobile-active');
+        signUpFormContainer.classList.add('mobile-active');
+    }
+    function switchToSignInMobile() {
+        signUpFormContainer.classList.remove('mobile-active');
+        signInFormContainer.classList.add('mobile-active');
+    }
 
     function togglePasswordVisibility(fieldId, icon) {
         const field = document.getElementById(fieldId);
@@ -1035,7 +1059,7 @@
         amountInput.value = '';
 
         if (nameLower.includes('binance')) {
-            minDepositInfo = (20 / currentBinanceRate).toFixed(2);
+            let minDepositInfo = (20 / currentBinanceRate).toFixed(2);
             minDepositLabel.innerText = `${minDepositInfo} USD`;
             amountLabel.innerText = "Amount (USD)";
             currencySymbol.innerText = "$";
@@ -1083,7 +1107,6 @@
         document.getElementById('user-panel-container').style.display = 'none';
     }
 
-    // Fixed Registration (Lowercase Email Normalization & Already Exists Check)
     function handleAuthRegister(e) {
         e.preventDefault();
         let name = document.getElementById('su-name').value.trim();
@@ -1117,11 +1140,11 @@
                 showCustomAlert('Registration successful! You can now sign in.');
                 document.getElementById('signupForm').reset();
                 authMainContainer.classList.remove("right-panel-active");
+                switchToSignInMobile();
             }
         });
     }
 
-    // Fixed Login (Lowercase Email Normalization)
     function handleAuthLogin(e) {
         e.preventDefault();
         let emailInput = document.getElementById('si-email').value.trim().toLowerCase();
@@ -1481,7 +1504,7 @@
                 document.getElementById('deposit-trx-input').value = '';
                 switchUserTab('history');
             }).catch(() => {
-                submitBtn.disabled = false;
+                submitBtn.disabled,submitBtn.disabled = false;
                 showCustomAlert('Something went wrong. Please try again.');
             });
         });
@@ -1523,7 +1546,7 @@
             tbody.innerHTML = ``;
             let data = snap.val() || {};
             let keys = Object.keys(data);
-            if(keys.length ===0) { tbody.innerHTML = `<tr><td colspan="4" class="text-center text-sub py-3">No deposit history found</td></tr>`; return; }
+            if(keys.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="text-center text-sub py-3">No deposit history found</td></tr>`; return; }
 
             keys.reverse().forEach(k => {
                 let d = data[k];
