@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mail Mart — Premium Admin Portal</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root{
+      --bg-main:#090d16;
+      --bg-sidebar:#05080f;
+      --card-bg:linear-gradient(135deg, rgba(18, 24, 38, 0.9) 0%, rgba(10, 14, 23, 0.95) 100%);
+      --text-main:#f1f5f9;
+      --text-muted:#94a3b8;
+      --accent:#6366f1;
+      --accent-hover:#4f46e5;
+      --accent-glow:rgba(99, 102, 241, 0.25);
+      --success:#10b981;
+      --danger:#ef4444;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(99, 102, 241, 0.3);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:'Plus Jakarta Sans',sans-serif;
+      background:var(--bg-main);
+      color:var(--text-main);
+      -webkit-font-smoothing:antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at center, #1e1b4b 0%, #090d16 100%);}
+    .auth-card{width:100%;max-width:420px;background:var(--card-bg);backdrop-filter:blur(12px);border-radius:24px;padding:38px;border:1px solid var(--border-glow);box-shadow:0 25px 50px -12px rgba(0,0,0,0.8);}
+    
+    .admin-sidebar{width:265px;background:var(--bg-sidebar);position:fixed;left:0;top:0;bottom:0;padding-top:24px;border-right:1px solid var(--border-color);z-index:1050;transition:transform 0.25s ease;will-change:transform;display:flex;flex-direction:column;}
+    .admin-main{margin-left:265px;padding:38px;min-height:100vh;transition:margin 0.25s ease;}
+
+    .sidebar-brand{padding:0 24px 26px 24px;display:flex;align-items:center;gap:14px;font-weight:800;font-size:20px;border-bottom:1px solid var(--border-color);color:#fff;background:linear-gradient(90deg, #fff, #a5b4fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .sidebar-menu{padding:20px 16px;flex:1;overflow-y:auto;}
+    .sidebar-menu a{display:flex;align-items:center;gap:12px;padding:13px 18px;border-radius:12px;color:var(--text-muted);text-decoration:none;font-weight:600;margin-bottom:8px;transition:all 0.2s ease;}
+    .sidebar-menu a.active,.sidebar-menu a:hover{background:linear-gradient(135deg, var(--accent), var(--accent-hover));color:#fff;box-shadow:0 6px 18px var(--accent-glow);transform:translateX(4px);}
+
+    .mobile-topbar{display:none;align-items:center;justify-content:space-between;background:var(--bg-sidebar);padding:14px 20px;border-bottom:1px solid var(--border-color);position:sticky;top:0;z-index:1040;}
+    .mobile-menu-btn{background:var(--card-bg);border:1px solid var(--border-color);color:#fff;padding:8px 12px;border-radius:10px;font-size:18px;cursor:pointer;}
+
+    .card-panel{background:var(--card-bg);backdrop-filter:blur(12px);padding:30px;border-radius:24px;border:1px solid var(--border-color);box-shadow:0 15px 35px rgba(0,0,0,0.3);margin-bottom:26px;position:relative;overflow:hidden;}
+    .card-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);}
+
+    h1,h2,h5{font-weight:800;color:#ffffff;margin-bottom:16px;letter-spacing:-0.03em;}
+    h1{font-size:30px;background:linear-gradient(180deg, #fff 0%, #cbd5e1 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    
+    label.form-label{font-weight:700;color:var(--text-main);font-size:12px;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.06em;}
+    
+    .form-control, .form-select, textarea, input {
+      background-color: rgba(15, 23, 42, 0.85) !important;
+      border: 1px solid var(--border-color) !important;
+      color: #f8fafc !important;
+      border-radius: 14px;
+      padding: 13px 18px;
+      font-size: 14px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .form-control:focus, .form-select:focus, textarea:focus, input:focus {
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 0 3px var(--accent-glow) !important;
+      background-color: rgba(15, 23, 42, 0.95) !important;
+      color: #ffffff !important;
+    }
+    .form-control::placeholder, textarea::placeholder{color:#94a3b8 !important; opacity:0.8;}
+
+    .stats-row{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:26px}
+    .stat-card{flex:1;min-width:220px;display:flex;align-items:center;gap:18px;padding:26px;border-radius:24px;background:var(--card-bg);border:1px solid var(--border-color);box-shadow:0 10px 30px rgba(0,0,0,0.25);transition:transform 0.2s ease;}
+    .stat-card:hover{transform:translateY(-3px);border-color:var(--border-glow);}
+    .stat-icon{width:58px;height:58px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;background:linear-gradient(135deg, var(--accent), var(--accent-hover));box-shadow:0 6px 16px var(--accent-glow)}
+    .stat-title{color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:0.05em;}
+    .stat-number{font-weight:800;font-size:28px;color:#fff;margin-top:2px;}
+
+    .table-card{border-radius:24px;padding:26px;background:var(--card-bg);border:1px solid var(--border-color);margin-bottom:26px;box-shadow:0 15px 35px rgba(0,0,0,0.3);}
+    .styled-table{width:100%;border-collapse:collapse}
+    .styled-table thead th{color:var(--text-muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;padding:15px 16px;text-align:left;border-bottom:1px solid var(--border-color)}
+    .styled-table tbody td{padding:16px;border-bottom:1px solid rgba(255,255,255,0.04);color:#f8fafc;font-size:14px;vertical-align:middle;}
+    .styled-table tbody tr{transition:background-color 0.15s ease;}
+    .styled-table tbody tr:hover{background-color:rgba(255,255,255,0.03);}
+    
+    .badge-approved{background:rgba(16, 185, 129, 0.15);color:#34d399;border:1px solid rgba(16, 185, 129, 0.3);padding:6px 12px;border-radius:10px;font-weight:700;font-size:11px}
+    .badge-pending{background:rgba(245, 158, 11, 0.15);color:#fbbf24;border:1px solid rgba(245, 158, 11, 0.3);padding:6px 12px;border-radius:10px;font-weight:700;font-size:11px}
+    .badge-rejected{background:rgba(239, 68, 68, 0.15);color:#f87171;border:1px solid rgba(239, 68, 68, 0.3);padding:6px 12px;border-radius:10px;font-weight:700;font-size:11px}
+
+    .btn-primary{background:linear-gradient(135deg, var(--accent), var(--accent-hover));border:none;padding:12px 24px;border-radius:14px;font-weight:700;box-shadow:0 4px 15px var(--accent-glow);transition:all 0.2s ease;}
+    .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px var(--accent-glow);background:linear-gradient(135deg, #4f46e5, #4338ca);}
+    
+    .btn-action-group {display: flex;gap: 8px;align-items: center;}
+    .btn-deposit-approve {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border: none;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-deposit-approve:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+      background: linear-gradient(135deg, #059669, #047857);
+      color: #fff;
+    }
+    .btn-deposit-reject {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #f87171;
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-deposit-reject:hover {
+      background: var(--danger);
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
+      transform: translateY(-1px);
+      border-color: var(--danger);
+    }
+
+    .btn-delete{background:rgba(239, 68, 68, 0.1);border:1px solid rgba(239, 68, 68, 0.2);color:#f87171;width:38px;height:38px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s ease;}
+    .btn-delete:hover{background:var(--danger);color:#fff;box-shadow:0 4px 14px rgba(239,68,68,0.35);}
+
+    .btn-edit-action{background:rgba(99, 102, 241, 0.1);border:1px solid rgba(99, 102, 241, 0.2);color:#818cf8;width:38px;height:38px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s ease; margin-right:6px;}
+    .btn-edit-action:hover{background:var(--accent);color:#fff;box-shadow:0 4px 14px var(--accent-glow);}
+
+    .provider-pill{display:inline-block;padding:6px 14px;border-radius:20px;font-weight:700;font-size:11px;background:rgba(255,255,255,0.05);border:1px solid var(--border-color);color:#e2e8f0;}
+
+    .main-category-row {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(30, 27, 75, 0.3) 100%);
+      cursor: pointer;
+      font-weight: bold;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.15) !important;
+    }
+    .main-category-row:hover {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(30, 27, 75, 0.5) 100%) !important;
+    }
+    .sub-category-row {
+      background: rgba(15, 23, 42, 0.5);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+    }
+    .sub-category-row:hover {
+      background: rgba(30, 41, 59, 0.7) !important;
+    }
+
+    @media (max-width:991px){
+      .admin-sidebar{transform:translateX(-100%);}
+      .admin-sidebar.mobile-show{transform:translateX(0);}
+      .admin-main{margin-left:0;padding:20px}
+      .mobile-topbar{display:flex;}
+      .stats-row{flex-direction:column}
+      
+      .styled-table thead { display: none; }
+      .styled-table, .styled-table tbody, .styled-table tr, .styled-table td { display: block; width: 100%; }
+      .styled-table tr { margin-bottom: 15px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 16px; padding: 12px; }
+      .styled-table td { padding: 8px 4px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; align-items: center; word-break: break-word; }
+      .styled-table td::before { content: attr(data-label); font-weight: 700; color: var(--text-muted); font-size: 11px; text-transform: uppercase; margin-right: 10px; flex-shrink: 0; }
+      .styled-table td:last-child { border-bottom: none; justify-content: flex-end; padding-top: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="toast" style="position:fixed;right:24px;bottom:24px;z-index:99999;display:none">
+  <div class="card-panel py-3 px-4 shadow-lg" id="toast-text" style="margin:0;background:#0f172a;border-color:var(--accent);"></div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="admin-auth" class="auth-wrap" style="display:none;">
+  <div class="auth-card">
+    <div style="text-align:center; margin-bottom:28px;">
+      <div style="width:58px;height:58px;border-radius:18px;background:linear-gradient(135deg, var(--accent), var(--accent-hover));display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:24px;box-shadow:0 8px 20px var(--accent-glow);margin-bottom:14px;"><i class="fa-solid fa-envelope-open-text"></i></div>
+      <h2 style="margin:0;font-size:24px;">Mail Mart Admin</h2>
+      <div class="text-muted" style="font-size:13px;margin-top:6px">Sign in to securely manage your platform</div>
+    </div>
+    <div>
+      <label class="form-label">Email Address</label>
+      <input id="adminEmail" class="form-control" type="email" placeholder="admin@gmail.com">
+    </div>
+    <div style="margin-top:16px;position:relative">
+      <label class="form-label">Password</label>
+      <input id="adminPass" class="form-control" type="password" placeholder="••••••••">
+      <button style="position:absolute;right:14px;top:38px;border:none;background:transparent;color:var(--text-muted)" onclick="togglePass()"><i id="eyeIcon" class="fa-solid fa-eye"></i></button>
+    </div>
+    <div style="margin-top:28px">
+      <button class="btn btn-primary w-100 py-3" onclick="adminLogin()">Sign In to Dashboard</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN MAIN -->
+<div id="admin-app" style="display:none">
+  <div class="mobile-topbar">
+    <div style="display:flex;align-items:center;gap:10px;font-weight:800;color:#fff;">
+      <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg, var(--accent), var(--accent-hover));display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-envelope-open-text"></i></div>
+      Mail Mart
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <button class="mobile-menu-btn text-danger" onclick="logoutAdmin()" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </div>
+
+  <aside id="adminSidebar" class="admin-sidebar">
+    <div class="sidebar-brand">
+      <div style="width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg, var(--accent), var(--accent-hover));display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 4px 15px var(--accent-glow)"><i class="fa-solid fa-envelope-open-text"></i></div>
+      <div>Mail Mart</div>
+    </div>
+    <nav class="sidebar-menu">
+      <a href="#" id="m-dashboard" class="active" onclick="openTab('dashboard')"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+      <a href="#" id="m-user-activity" onclick="openTab('user-activity')"><i class="fa-solid fa-address-book"></i> User History (A-Z)</a>
+      <a href="#" id="m-live-inventory" onclick="openTab('live-inventory')"><i class="fa-solid fa-boxes-stacked"></i> Live Inventory</a>
+      <a href="#" id="m-categories" onclick="openTab('categories')"><i class="fa-solid fa-list"></i> Categories</a>
+      <a href="#" id="m-stocks" onclick="openTab('stocks')"><i class="fa-solid fa-box-archive"></i> Add Stocks</a>
+      <a href="#" id="m-stock-view" onclick="openTab('stock-view')"><i class="fa-solid fa-eye"></i> View Stock Mails</a>
+      <a href="#" id="m-deposits" onclick="openTab('deposits')"><i class="fa-solid fa-wallet"></i> Deposit Requests</a>
+      <a href="#" id="m-payments" onclick="openTab('payments')"><i class="fa-solid fa-credit-card"></i> Payments</a>
+      <a href="#" id="m-users" onclick="openTab('users')"><i class="fa-solid fa-users"></i> Users</a>
+    </nav>
+    <div style="padding: 16px; border-top: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
+      <a href="#" style="color:#f87171; display:flex; align-items:center; gap:12px; padding:12px 18px; border-radius:12px; text-decoration:none; font-weight:600; background: rgba(239, 68, 68, 0.08); transition:all 0.2s;" onclick="logoutAdmin()"><i class="fa-solid fa-right-from-bracket"></i> Logout Portal</a>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <section id="tab-dashboard" style="display:block">
+      <h1>Dashboard Overview</h1>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+          <div><div class="stat-title">Total Users</div><div id="statUsers" class="stat-number">0</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:linear-gradient(135deg, #10b981, #059669);box-shadow:0 8px 20px rgba(16,185,129,0.3)"><i class="fa-solid fa-box"></i></div>
+          <div><div class="stat-title">Real Stock Available</div><div id="statStocks" class="stat-number">0</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:linear-gradient(135deg, #f59e0b, #d97706);box-shadow:0 8px 20px rgba(245,158,11,0.3)"><i class="fa-solid fa-clock"></i></div>
+          <div><div class="stat-title">Pending Deposits</div><div id="statDeposits" class="stat-number">0</div></div>
+        </div>
+      </div>
+
+      <div class="card-panel mb-4" style="border-color: rgba(16, 185, 129, 0.3);">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <div class="stat-title text-success mb-1"><i class="fa-solid fa-wallet me-2"></i>Total Approved Deposit Amount</div>
+            <div id="statTotalApprovedDeposit" class="stat-number text-white" style="font-size:36px;">৳0</div>
+          </div>
+          <div class="col-md-4 mt-3 mt-md-0 text-md-end">
+            <label class="form-label">Time Period</label>
+            <select id="depositTimeFilter" class="form-select" onchange="loadDashboard()">
+              <option value="1month" selected>Last 1 Month</option>
+              <option value="2months">Last 2 Months</option>
+              <option value="3months">Last 3 Months</option>
+              <option value="all">All Time</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-card mt-4">
+        <h5><i class="fa-solid fa-receipt text-warning me-2"></i>Last 10 Purchases</h5>
+        <div style="overflow:auto">
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>User Email</th>
+                <th>Category</th>
+                <th>Quantity</th>
+                <th>Total Price</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="dashboardLast10OrdersBody">
+              <tr><td colspan="6" class="text-muted text-center py-3">Loading recent purchases...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- USER ACTIVITY HISTORY TAB -->
+    <section id="tab-user-activity" style="display:none">
+      <h1>User Purchase & Deposit History (A-Z)</h1>
+      <div class="card-panel">
+        <div class="row g-3 align-items-center mb-4">
+          <div class="col-md-8">
+            <label class="form-label">Search User by Gmail (e.g., user@gmail.com)</label>
+            <div class="input-group">
+              <input id="activityUserSearchInput" class="form-control" placeholder="Type user gmail to check a-z history...">
+              <button class="btn btn-primary" onclick="searchUserActivityHistory()"><i class="fa-solid fa-search me-1"></i> Search History</button>
+            </div>
+          </div>
+          <div class="col-md-4 text-md-end">
+            <div class="text-muted" style="font-size:12px; margin-top:20px;">View what they bought & deposit logs with date</div>
+          </div>
+        </div>
+
+        <div id="userActivityDetailsContainer" style="display:none;">
+          <div class="p-3 mb-4 rounded-4" style="background: rgba(99, 102, 241, 0.1); border: 1px solid var(--border-glow);">
+            <h5 class="mb-1" style="color: #a5b4fc;"><i class="fa-solid fa-user-circle me-2"></i>User Profile: <span id="lblActivityEmail" class="text-white"></span></h5>
+            <div class="d-flex gap-4 mt-2" style="font-size: 13px;">
+              <div>Current Balance: <strong class="text-success" id="lblActivityBalance">৳0</strong></div>
+            </div>
+          </div>
+
+          <div class="row g-4">
+            <div class="col-lg-6">
+              <div class="table-card mb-0">
+                <h5 class="text-info"><i class="fa-solid fa-bag-shopping me-2"></i>Purchased Items History</h5>
+                <div style="overflow:auto; max-height: 400px;">
+                  <table class="styled-table">
+                    <thead>
+                      <tr>
+                        <th>Category</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Date & Time</th>
+                      </tr>
+                    </thead>
+                    <tbody id="activityPurchasesBody">
+                      <tr><td colspan="4" class="text-muted text-center">No purchases found</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="table-card mb-0">
+                <h5 class="text-warning"><i class="fa-solid fa-wallet me-2"></i>Deposit Records History</h5>
+                <div style="overflow:auto; max-height: 400px;">
+                  <table class="styled-table">
+                    <thead>
+                      <tr>
+                        <th>Method</th>
+                        <th>Amount</th>
+                        <th>TrxID / Status</th>
+                        <th>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody id="activityDepositsBody">
+                      <tr><td colspan="4" class="text-muted text-center">No deposits found</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="userActivityInitialPrompt" class="text-center py-5 text-muted">
+          <i class="fa-solid fa-magnifying-glass fs-1 mb-3 text-secondary"></i>
+          <p>Please enter a user's Gmail above and click Search to view their complete A-Z history.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIVE INVENTORY STOCK TAB -->
+    <section id="tab-live-inventory" style="display:none">
+      <h1>Live Inventory Stock</h1>
+      <div class="card-panel">
+        <div class="d-flex align-items-center gap-3 mb-4">
+          <div style="width:46px;height:46px;border-radius:14px;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:20px;"><i class="fa-solid fa-boxes-stacked"></i></div>
+          <div>
+            <h5 class="mb-0" style="font-size:18px;">Live Inventory Stock Status (Real Stock Only)</h5>
+            <div class="text-muted" style="font-size:12px;">Real-time available stock count & pricing across categories</div>
+          </div>
+        </div>
+        <div style="overflow:auto">
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Item Title</th>
+                <th>Price</th>
+                <th>Real In Stock</th>
+              </tr>
+            </thead>
+            <tbody id="liveInventoryBody">
+              <tr><td colspan="4" class="text-muted text-center py-4">Loading live inventory...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- CATEGORIES MANAGEMENT TAB -->
+    <section id="tab-categories" style="display:none">
+      <h1>Categories Management</h1>
+      <div class="card-panel">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label">Main Category</label>
+            <input id="catMain" class="form-control" list="mainCategoryList" placeholder="Select or type...">
+            <datalist id="mainCategoryList"></datalist>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Sub Category</label>
+            <input id="catSub" class="form-control" list="subCategoryList" placeholder="Select or type...">
+            <datalist id="subCategoryList"></datalist>
+          </div>
+          <div class="col-md-2" style="display:none;">
+            <label class="form-label">Sort Order (No.)</label>
+            <input id="catOrder" type="number" class="form-control" value="0" placeholder="1, 2, 3...">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Description</label>
+            <textarea id="catDesc" class="form-control" rows="1" placeholder="Write clear description for category..."></textarea>
+          </div>
+          <div class="col-12 text-end"><button class="btn btn-primary" onclick="addCategory()">Add Category</button></div>
+        </div>
+      </div>
+      <div class="table-card">
+        <h5 class="mb-3" style="color: #a5b4fc;"><i class="fa-solid fa-list-ul me-2"></i>Existing Categories (Click Main Category to Expand/Collapse Sub-Categories)</h5>
+        <div style="overflow:auto">
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th style="width:35%;">Category / Sub-Category</th>
+                <th style="width:40%;">Description</th>
+                <th style="width:10%;">Status</th>
+                <th style="width:15%; text-align:right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="categoriesBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADD STOCKS TAB -->
+    <section id="tab-stocks" style="display:none">
+      <h1>Add Stocks</h1>
+      <div class="card-panel mb-4">
+        <h5 class="text-info mb-3"><i class="fa-solid fa-database me-2"></i>Real Stock Upload & Price Setting</h5>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Select Sub-Category</label>
+            <select id="stockCategory" class="form-select" onchange="onStockCategorySelect(this)"></select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Price (BDT)</label>
+            <input id="stockPrice" type="number" class="form-control" placeholder="Set price for category">
+          </div>
+          <div class="col-md-5">
+            <label class="form-label">Upload (.txt/.csv)</label>
+            <input id="stockFile" type="file" class="form-control" accept=".txt,.csv" onchange="loadStockFile(event)">
+          </div>
+          <div class="col-12">
+            <label class="form-label">Accounts (one per line)</label>
+            <textarea id="stockAccounts" class="form-control" rows="4" placeholder="email:password"></textarea>
+          </div>
+          <div class="col-12 text-end"><button class="btn btn-success px-4 py-3 fw-bold" onclick="uploadStocks()">Upload Real Stocks & Save Price</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-stock-view" style="display:none">
+      <h1>View Stock Mails</h1>
+      <div class="card-panel mb-3">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Select Category to View Mails</label>
+            <select id="viewStockCategory" class="form-select" onchange="loadStockMailsByCategory()"></select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Update All Prices in Category (BDT)</label>
+            <div class="input-group">
+              <input id="bulkNewPrice" type="number" class="form-control" placeholder="New price">
+              <button class="btn btn-success" onclick="updateCategoryBulkPrice()">Update All</button>
+            </div>
+          </div>
+          <div class="col-md-4 text-md-end d-flex align-items-end justify-content-md-end mt-2 mt-md-0">
+            <button class="btn btn-danger btn-sm px-3 py-2" onclick="deleteSelectedStocks()"><i class="fa-solid fa-trash me-1"></i> Delete Selected Mails</button>
+          </div>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5>Available Stock Mails List</h5>
+        </div>
+        <div style="overflow:auto">
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th style="width:40px;"><input type="checkbox" id="selectAllStocks" onclick="toggleSelectAllStocks(this)"></th>
+                <th>Account Details / Email</th>
+                <th>Price (BDT)</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="stockMailsTableBody">
+              <tr><td colspan="5" class="text-muted text-center py-4">Please select a category above</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEPOSIT REQUESTS TAB -->
+    <section id="tab-deposits" style="display:none">
+      <h1>Deposit Requests</h1>
+      <div class="card-panel mb-3">
+        <div class="row g-2 align-items-center">
+          <div class="col-md-4"><input id="searchTrx" class="form-control" placeholder="Search by TrxID..." oninput="renderDeposits()"></div>
+          <div class="col-md-3"><select id="filterStatus" class="form-select" onchange="renderDeposits()"><option value="">All Status</option><option value="Pending">Pending</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option></select></div>
+          <div class="col-md-5 text-end"><button class="btn btn-sm btn-secondary px-4 py-2" onclick="loadCachedData(true)">Refresh Data</button></div>
+        </div>
+      </div>
+      <div class="table-card">
+        <div style="overflow:auto">
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Method</th>
+                <th>Amount</th>
+                <th>TrxID & Reason</th>
+                <th>Status</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="depositsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-payments" style="display:none">
+      <h1>Payments & Support Settings</h1>
+      <div class="card-panel mb-3" style="border-color: rgba(59, 130, 246, 0.4);">
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="form-label" style="color: #60a5fa;">Send Live Notification to User Panels</label>
+            <input id="adminNotificationInput" class="form-control" placeholder="Type notification message here to broadcast...">
+          </div>
+          <div class="col-md-4 d-flex align-items-end gap-2">
+            <button class="btn btn-primary w-50" onclick="saveUserNotification()">Send</button>
+            <button class="btn btn-outline-danger w-50" onclick="clearUserNotification()">Clear</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card-panel mb-3" style="border-color: rgba(252, 213, 53, 0.4);">
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="form-label" style="color: #fcd535;">Binance Dollar Rate (1 USDT = ? BDT)</label>
+            <input id="binanceRateInput" type="number" step="0.01" class="form-control" placeholder="e.g. 120">
+          </div>
+          <div class="col-md-4 d-flex align-items-end">
+            <button class="btn btn-warning w-100 fw-bold text-dark" onclick="saveBinanceRate()">Save Dollar Rate</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-panel mb-3">
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="form-label">Support Link / Telegram Username</label>
+            <input id="supportInput" class="form-control" placeholder="@username or https://t.me/username">
+          </div>
+          <div class="col-md-4 d-flex align-items-end">
+            <button class="btn btn-primary w-100" onclick="saveSupport()">Save Support</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-panel mb-3">
+        <div class="row g-3">
+          <div class="col-md-3"><label class="form-label">Method Name</label><input id="payName" class="form-control" placeholder="bKash / Binance"></div>
+          <div class="col-md-3"><label class="form-label">Account Type</label><select id="payType" class="form-select"><option>Send Money</option><option>Cash Out</option><option>Personal</option><option>Agent</option><option>Binance Pay ID / USDT Address</option></select></div>
+          <div class="col-md-3"><label class="form-label">Account Number / Details</label><input id="payNumber" class="form-control" placeholder="017xxxxxxxx or Wallet"></div>
+          <div class="col-md-3"><label class="form-label">Logo Image URL</label><input id="payLogo" class="form-control" placeholder="https://... logo url"></div>
+          <div class="col-12 text-end mt-2"><button class="btn btn-primary" onclick="addPayment()">Add Payment Method</button></div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <h5>Active Payment Methods</h5>
+        <div style="overflow:auto">
+          <table class="styled-table">
+            <thead><tr><th>Name</th><th>Type</th><th>Number</th><th>Logo URL</th><th>Action</th></tr></thead>
+            <tbody id="paymentsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-users" style="display:none">
+      <h1>Users Management</h1>
+      <div class="card-panel mb-3">
+        <div class="row g-2">
+          <div class="col-md-6"><input id="searchUserGmail" class="form-control" placeholder="Search user by Gmail..." oninput="renderUsers()"></div>
+        </div>
+      </div>
+      <div class="table-card">
+        <div style="overflow:auto">
+          <table class="styled-table">
+            <thead><tr><th>Email</th><th>Balance</th><th>Action</th></tr></thead>
+            <tbody id="usersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Modal for Easy Balance Plus/Minus -->
+<div class="modal fade" id="balanceModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background:#0f172a; border:1px solid var(--border-glow); border-radius:24px; color:#fff;">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title" style="font-weight:800;">Manage User Balance</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted" style="font-size:13px;" id="modalUserEmailLabel"></p>
+        <div class="mb-3">
+          <label class="form-label">Current Balance</label>
+          <div class="fs-4 text-success fw-bold" id="modalCurrentBalance">৳0</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Enter Amount</label>
+          <input type="number" id="balanceInputAmount" class="form-control" placeholder="e.g. 100">
+        </div>
+        <div class="d-flex gap-3">
+          <button class="btn btn-danger w-50 py-3 fw-bold" onclick="modifyUserBalance('minus')"><i class="fa-solid fa-minus me-1"></i> Sub (-) Amount</button>
+          <button class="btn btn-success w-50 py-3 fw-bold" onclick="modifyUserBalance('plus')"><i class="fa-solid fa-plus me-1"></i> Add (+) Amount</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCvMV3iQcRlX0AaZMtL_VjEngyQtRhEdNY",
+    authDomain: "mailp-92874.firebaseapp.com",
+    databaseURL: "https://mailp-92874-default-rtdb.firebaseio.com",
+    projectId: "mailp-92874",
+    storageBucket: "mailp-92874.firebasestorage.app",
+    messagingSenderId: "540857867402",
+    appId: "1:540857867402:web:a80e0b3278e04f6da86173",
+    measurementId: "G-N2YM7QCPNY"
+  };
+  if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // Global Caching Variables for Instant Speed
+  let globalCache = {
+    categories: {},
+    stocks: {},
+    orders: {},
+    deposits: {},
+    users: {},
+    balances: {},
+    paymentMethods: {},
+    settings: {}
+  };
+
+  firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => {
+      firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+          initApp();
+        } else {
+          document.getElementById('admin-auth').style.display = 'flex';
+          document.getElementById('admin-app').style.display = 'none';
+        }
+      });
+    })
+    .catch(e => console.error("Persistence error:", e));
+
+  function showToast(msg){ 
+    document.getElementById('toast-text').innerText = msg; 
+    const t = document.getElementById('toast'); 
+    t.style.display = 'block'; 
+    setTimeout(() => t.style.display = 'none', 3000); 
+  }
+  
+  function escapeHtml(s){ return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'); }
+  function togglePass(){ const p=document.getElementById('adminPass'); const eye=document.getElementById('eyeIcon'); if(p.type==='password'){p.type='text';eye.className='fa-solid fa-eye-slash'}else{p.type='password';eye.className='fa-solid fa-eye'} }
+  
+  function toggleMobileSidebar(){
+    const sidebar = document.getElementById('adminSidebar');
+    sidebar.classList.toggle('mobile-show');
+  }
+
+  function adminLogin(){
+    const email=document.getElementById('adminEmail').value.trim();
+    const pass=document.getElementById('adminPass').value.trim();
+    if(!email||!pass){ showToast('Enter email & password'); return; }
+    firebase.auth().signInWithEmailAndPassword(email,pass).then(()=>{ initApp(); }).catch(e=>showToast('Login failed: '+e.message));
+  }
+  function logoutAdmin(){ firebase.auth().signOut().finally(()=>{ location.reload(); }); }
+
+  // Background Preloading to make everything lightning fast instantly!
+  function loadCachedData(showMsg = false){
+    db.ref().once('value', snapshot => {
+      const allData = snapshot.val() || {};
+      globalCache.categories = allData.categories || {};
+      globalCache.stocks = allData.stocks || {};
+      globalCache.orders = allData.orders || {};
+      globalCache.deposits = allData.deposits || {};
+      globalCache.users = allData.users || {};
+      globalCache.balances = allData.balances || {};
+      globalCache.paymentMethods = allData.paymentMethods || {};
+      globalCache.settings = allData.settings || {};
+
+      // Refresh current active view instantly if needed
+      const activeTab = document.querySelector('.sidebar-menu a.active');
+      if(activeTab) {
+        const tabId = activeTab.id.replace('m-', '');
+        openTab(tabId);
+      }
+      if(showMsg) showToast('All data refreshed successfully!');
+    });
+  }
+
+  function openTab(name){
+    document.querySelectorAll('[id^="tab-"]').forEach(s=>s.style.display='none');
+    document.querySelectorAll('.sidebar-menu a').forEach(a=>a.classList.remove('active'));
+    document.getElementById('m-'+name).classList.add('active');
+    document.getElementById('tab-'+name).style.display='block';
+    
+    if(window.innerWidth <= 991) {
+      document.getElementById('adminSidebar').classList.remove('mobile-show');
+    }
+
+    if(name==='live-inventory') renderLiveInventory();
+    if(name==='categories') renderCategories();
+    if(name==='stocks') { renderCategoryOptions(); }
+    if(name==='stock-view') renderViewStockCategoryOptions();
+    if(name==='deposits') renderDeposits();
+    if(name==='payments') { renderPayments(); loadSupportSettings(); }
+    if(name==='users') renderUsers();
+    if(name==='dashboard') renderDashboard();
+  }
+
+  function initApp(){
+    document.getElementById('admin-auth').style.display='none';
+    document.getElementById('admin-app').style.display='block';
+    showToast('Loading system data...');
+    loadCachedData(); // Load all data into cache on startup
+  }
+
+  function searchUserActivityHistory(){
+    const queryEmail = (document.getElementById('activityUserSearchInput').value || '').trim().toLowerCase();
+    if(!queryEmail){
+      showToast('Please enter a user gmail first!');
+      return;
+    }
+
+    const safeKey = queryEmail.replace(/[@.]/g, '_');
+    const bal = globalCache.balances[safeKey] || 0;
+    document.getElementById('lblActivityBalance').innerText = '৳' + bal;
+    document.getElementById('lblActivityEmail').innerText = queryEmail;
+
+    const pBody = document.getElementById('activityPurchasesBody');
+    pBody.innerHTML = '';
+    let pCount = 0;
+
+    Object.values(globalCache.orders).forEach(o => {
+      if(o && o.user && o.user.toLowerCase().trim() === queryEmail) {
+        pCount++;
+        let formattedDate = o.date || '-';
+        if(o.timestamp) {
+          formattedDate = new Date(o.timestamp).toLocaleString();
+        }
+        pBody.insertAdjacentHTML('beforeend', `
+          <tr>
+            <td><strong>${escapeHtml(o.category || '-')}</strong></td>
+            <td>${o.quantity || 1}</td>
+            <td class="text-success">৳${o.totalPrice || o.price || 0}</td>
+            <td style="font-size:12px; color:var(--text-muted);">${escapeHtml(formattedDate)}</td>
+          </tr>
+        `);
+      }
+    });
+
+    if(pCount === 0){
+      pBody.innerHTML = '<tr><td colspan="4" class="text-muted text-center">No purchases found for this user</td></tr>';
+    }
+
+    const dBody = document.getElementById('activityDepositsBody');
+    dBody.innerHTML = '';
+    let dCount = 0;
+
+    Object.values(globalCache.deposits).forEach(d => {
+      if(d && d.email && d.email.toLowerCase().trim() === queryEmail) {
+        dCount++;
+        const statusBadge = d.status === 'Approved' ? 'badge-approved' : (d.status === 'Rejected' ? 'badge-rejected' : 'badge-pending');
+        let formattedDepDate = 'N/A';
+        if(d.timestamp) {
+          formattedDepDate = new Date(d.timestamp).toLocaleString();
+        } else if(d.date) {
+          formattedDepDate = d.date;
+        }
+        dBody.insertAdjacentHTML('beforeend', `
+          <tr>
+            <td><span class="provider-pill">${escapeHtml(d.method || '-')}</span></td>
+            <td class="text-success"><strong>৳${d.amount || 0}</strong></td>
+            <td>
+              <code style="color:#93c5fd">${escapeHtml(d.trx || '-')}</code><br>
+              <span class="${statusBadge}" style="font-size:9px; padding:2px 6px;">${escapeHtml(d.status || 'Pending')}</span>
+            </td>
+            <td style="font-size:12px; color:var(--text-muted);">${escapeHtml(formattedDepDate)}</td>
+          </tr>
+        `);
+      }
+    });
+
+    if(dCount === 0){
+      dBody.innerHTML = '<tr><td colspan="4" class="text-muted text-center">No deposit records found for this user</td></tr>';
+    }
+
+    document.getElementById('userActivityInitialPrompt').style.display = 'none';
+    document.getElementById('userActivityDetailsContainer').style.display = 'block';
+    showToast('User history loaded successfully!');
+  }
+
+  function renderLiveInventory(){
+    const tbody = document.getElementById('liveInventoryBody');
+    tbody.innerHTML = '';
+
+    const categories = globalCache.categories;
+    const stocks = globalCache.stocks;
+    const catKeys = Object.keys(categories);
+    
+    if(catKeys.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="text-muted text-center py-4">No categories found</td></tr>';
+      return;
+    }
+
+    catKeys.forEach(catKey => {
+      const c = categories[catKey];
+      if(!c) return;
+      const mainCat = c.cat || '';
+      const subCat = c.subCat || '';
+      const categoryFullName = `${mainCat} - ${subCat}`;
+
+      let realCount = 0;
+      let itemPrice = 0;
+
+      Object.values(stocks).forEach(item => {
+        if(item && item.category && item.category.trim() === categoryFullName.trim() && item.status === 'available') {
+          realCount++;
+          if(item.price) itemPrice = item.price;
+        }
+      });
+
+      const stockBadgeClass = realCount > 0 ? 'badge-approved' : 'badge-rejected';
+      const stockText = `${realCount} pcs`;
+
+      tbody.insertAdjacentHTML('beforeend', `
+        <tr>
+          <td data-label="Category"><span class="provider-pill">${escapeHtml(mainCat)}</span></td>
+          <td data-label="Item Title"><strong>${escapeHtml(subCat)}</strong></td>
+          <td data-label="Price"><span style="color:#fcd535;font-weight:700">৳${itemPrice.toFixed(2)}</span></td>
+          <td data-label="Real In Stock"><span class="${stockBadgeClass}">${stockText}</span></td>
+        </tr>
+      `);
+    });
+  }
+
+  function renderDashboard(){
+    // Unique Users Calculation
+    const uniqueEmails = new Set();
+    Object.values(globalCache.users).forEach(user => {
+      if(user && user.email) uniqueEmails.add(user.email.toLowerCase().trim());
+    });
+    document.getElementById('statUsers').innerText = uniqueEmails.size; 
+
+    // Available Stocks
+    const avail = Object.values(globalCache.stocks).filter(x => x.status === 'available').length;
+    document.getElementById('statStocks').innerText = avail;
+
+    // Pending Deposits & Approved Sum
+    const depositsArr = Object.values(globalCache.deposits);
+    const pending = depositsArr.filter(x => x.status === 'Pending').length; 
+    document.getElementById('statDeposits').innerText = pending; 
+
+    const timeFilter = document.getElementById('depositTimeFilter').value;
+    const now = Date.now();
+    let cutoffTime = 0;
+    if(timeFilter === '1month') cutoffTime = now - (30 * 24 * 60 * 60 * 1000);
+    else if(timeFilter === '2months') cutoffTime = now - (60 * 24 * 60 * 60 * 1000);
+    else if(timeFilter === '3months') cutoffTime = now - (90 * 24 * 60 * 60 * 1000);
+    else if(timeFilter === 'all') cutoffTime = 0;
+
+    let totalApprovedAmount = 0;
+    depositsArr.forEach(dep => {
+      if(dep && dep.status === 'Approved') {
+        let depTime = dep.timestamp || 0;
+        if(depTime >= cutoffTime) {
+          totalApprovedAmount += parseFloat(dep.amount || 0);
+        }
+      }
+    });
+    document.getElementById('statTotalApprovedDeposit').innerText = '৳' + totalApprovedAmount.toLocaleString();
+
+    renderDashboardLast10Orders();
+  }
+
+  function renderDashboardLast10Orders() {
+    const ordersData = globalCache.orders;
+    const tbody = document.getElementById('dashboardLast10OrdersBody');
+    tbody.innerHTML = '';
+    let keys = Object.keys(ordersData);
+    if(keys.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-muted text-center py-3">No purchases found yet</td></tr>';
+      return;
+    }
+    keys.sort((a, b) => (ordersData[b].timestamp || 0) - (ordersData[a].timestamp || 0));
+    let last10Keys = keys.slice(0, 10);
+
+    last10Keys.forEach(k => {
+      let o = ordersData[k];
+      let formattedOrderDate = o.date || '-';
+      if(o.timestamp) formattedOrderDate = new Date(o.timestamp).toLocaleString();
+      tbody.insertAdjacentHTML('beforeend', `
+        <tr>
+          <td data-label="Order ID"><code>${escapeHtml(o.orderId || '#---')}</code></td>
+          <td data-label="User Email">${escapeHtml(o.user || '-')}</td>
+          <td data-label="Category">${escapeHtml(o.category || '-')}</td>
+          <td data-label="Quantity">${o.quantity || 1}</td>
+          <td data-label="Total Price">৳${o.totalPrice || o.price || 0}</td>
+          <td data-label="Date">${escapeHtml(formattedOrderDate)}</td>
+        </tr>
+      `);
+    });
+  }
+
+  function addCategory(){
+    const main=document.getElementById('catMain').value.trim();
+    const sub=document.getElementById('catSub').value.trim();
+    const order=parseInt(document.getElementById('catOrder').value) || 0;
+    const desc=document.getElementById('catDesc').value.trim();
+    if(!main||!sub){ showToast('Enter main and sub category'); return; }
+    
+    db.ref('categories').push({cat:main, subCat:sub, sortOrder:order, description:desc, status:'ON'}).then(()=>{ 
+      document.getElementById('catMain').value=''; 
+      document.getElementById('catSub').value=''; 
+      document.getElementById('catDesc').value=''; 
+      showToast('Category added successfully'); 
+      loadCachedData(); 
+    });
+  }
+
+  function renderCategories(){
+    const cats = globalCache.categories;
+    const body = document.getElementById('categoriesBody'); 
+    body.innerHTML = '';
+    const mainList = document.getElementById('mainCategoryList'); 
+    const subList = document.getElementById('subCategoryList');
+    mainList.innerHTML = ''; 
+    subList.innerHTML = '';
+    
+    let keys = Object.keys(cats || {}); 
+    if(!keys.length){ 
+      body.innerHTML = '<tr><td colspan="4" class="text-muted text-center py-4">No categories found</td></tr>'; 
+      return; 
+    }
+    
+    keys.sort((a,b) => (cats[a].sortOrder || 0) - (cats[b].sortOrder || 0));
+
+    const grouped = {};
+    const uniqueMains = new Set(); 
+    const uniqueSubs = new Set();
+
+    keys.forEach(k=>{
+      const c = cats[k]||{};
+      if(c.cat) uniqueMains.add(c.cat);
+      if(c.subCat) uniqueSubs.add(c.subCat);
+
+      const mainName = c.cat || 'Uncategorized';
+      if(!grouped[mainName]) grouped[mainName] = [];
+      grouped[mainName].push({ key: k, data: c });
+    });
+
+    Object.keys(grouped).forEach((mainCat, index) => {
+      const subItems = grouped[mainCat];
+      const collapseId = 'subCatGroup_' + index;
+
+      body.insertAdjacentHTML('beforeend', `
+        <tr class="main-category-row" onclick="toggleCategoryGroup('${collapseId}', this)">
+          <td data-label="Category">
+            <i class="fa-solid fa-chevron-right me-2 transition-icon" id="icon_${collapseId}"></i>
+            <strong style="font-size:15px; color:#ffffff;">${escapeHtml(mainCat)}</strong> 
+            <span class="badge bg-primary ms-2" style="font-size:10px; background:var(--accent)!important;">${subItems.length} sub-categories</span>
+          </td>
+          <td data-label="Description"><span class="text-muted" style="font-style:italic;">Click to expand/collapse sub-categories</span></td>
+          <td data-label="Status">-</td>
+          <td data-label="Action" style="text-align:right;">-</td>
+        </tr>
+      `);
+
+      subItems.forEach(subObj => {
+        const k = subObj.key;
+        const c = subObj.data;
+        body.insertAdjacentHTML('beforeend', `
+          <tr class="sub-category-row sub-group-${collapseId}" style="display: none;">
+            <td data-label="Sub-Category" style="padding-left: 35px;">
+              <i class="fa-solid fa-angle-right me-2 text-muted" style="font-size:10px;"></i>
+              <span style="color:#a5b4fc; font-weight:600;">${escapeHtml(c.subCat||'')}</span>
+            </td>
+            <td data-label="Description"><span style="color:#e2e8f0;white-space:pre-wrap">${escapeHtml(c.description||'No description')}</span></td>
+            <td data-label="Status">${c.status==='ON'?'<span class="badge-approved">ON</span>':'<span class="badge-rejected">OFF</span>'}</td>
+            <td data-label="Action" style="text-align:right;">
+              <button class="btn-edit-action" onclick="editCategoryDetails('${k}')" title="Edit Category Details"><i class="fa-solid fa-pen"></i></button>
+              <button class="btn btn-sm btn-outline-light me-1 px-3 py-2 rounded-2" onclick="toggleCategory('${k}','${c.status||'ON'}')">${c.status==='ON'?'OFF':'ON'}</button>
+              <button class="btn-delete" onclick="removeCategory('${k}')"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>
+        `);
+      });
+    });
+
+    uniqueMains.forEach(m => mainList.insertAdjacentHTML('beforeend', `<option value="${escapeHtml(m)}">`));
+    uniqueSubs.forEach(s => subList.insertAdjacentHTML('beforeend', `<option value="${escapeHtml(s)}">`));
+  }
+
+  function toggleCategoryGroup(collapseId, rowEl) {
+    const subRows = document.querySelectorAll('.sub-group-' + collapseId);
+    const iconEl = document.getElementById('icon_' + collapseId);
+    let isHidden = subRows[0] && subRows[0].style.display === 'none';
+    
+    subRows.forEach(tr => { tr.style.display = isHidden ? 'table-row' : 'none'; });
+
+    if(isHidden) {
+      iconEl.style.transform = 'rotate(90deg)';
+      rowEl.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(30, 27, 75, 0.6) 100%)';
+    } else {
+      iconEl.style.transform = 'rotate(0deg)';
+      rowEl.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(30, 27, 75, 0.3) 100%)';
+    }
+  }
+
+  function editCategoryDetails(key){
+    const c = globalCache.categories[key] || {};
+    const newDesc = prompt('Edit description:', c.description || '');
+    if(newDesc === null) return;
+
+    db.ref(`categories/${key}`).update({ description: newDesc.trim() }).then(()=>{
+      showToast('Category updated successfully');
+      loadCachedData();
+    }).catch(e=>showToast('Error: '+e.message));
+  }
+
+  function toggleCategory(key,cur){ 
+    db.ref(`categories/${key}/status`).set(cur==='ON'?'OFF':'ON').then(()=>loadCachedData()); 
+  }
+  function removeCategory(key){ 
+    if(!confirm('Delete category?')) return; 
+    db.ref(`categories/${key}`).remove().then(()=>loadCachedData()); 
+  }
+
+  function renderCategoryOptions(){
+    const cats = globalCache.categories;
+    const sel = document.getElementById('stockCategory'); 
+    sel.innerHTML = '<option value="">Select Category</option>'; 
+    let keys = Object.keys(cats);
+    keys.sort((a,b) => (cats[a].sortOrder || 0) - (cats[b].sortOrder || 0));
+    keys.forEach(k=>{ 
+      let c = cats[k];
+      if(c.status==='ON') sel.insertAdjacentHTML('beforeend', `<option value="${escapeHtml(c.cat)} - ${escapeHtml(c.subCat)}">${escapeHtml(c.cat)} -> ${escapeHtml(c.subCat)}</option>`); 
+    }); 
+    if(!sel.childElementCount) sel.innerHTML = '<option value="">No active categories</option>'; 
+  }
+
+  function onStockCategorySelect(selectEl) {
+    const selectedCategory = selectEl.value;
+    if(!selectedCategory) return;
+    
+    for(let k in globalCache.stocks) {
+      let item = globalCache.stocks[k];
+      if(item && item.category && item.category.trim() === selectedCategory.trim() && item.price) {
+        document.getElementById('stockPrice').value = item.price;
+        break;
+      }
+    }
+  }
+
+  function renderViewStockCategoryOptions(){
+    const cats = globalCache.categories;
+    const sel = document.getElementById('viewStockCategory'); 
+    sel.innerHTML = '<option value="">Select Category</option>'; 
+    let keys = Object.keys(cats);
+    keys.sort((a,b) => (cats[a].sortOrder || 0) - (cats[b].sortOrder || 0));
+    keys.forEach(k=>{ 
+      let c = cats[k];
+      if(c.status==='ON') {
+        const catName = `${escapeHtml(c.cat)} - ${escapeHtml(c.subCat)}`;
+        sel.insertAdjacentHTML('beforeend', `<option value="${catName}">${catName}</option>`); 
+      }
+    }); 
+  }
+
+  function loadStockMailsByCategory(){
+    const selectedCategory = document.getElementById('viewStockCategory').value;
+    const tbody = document.getElementById('stockMailsTableBody');
+    tbody.innerHTML = '';
+    
+    if(!selectedCategory) {
+      tbody.innerHTML = '<tr><td colspan="5" class="text-muted text-center py-4">Please select a category above</td></tr>';
+      return;
+    }
+
+    const stocks = globalCache.stocks;
+    let found = 0;
+
+    Object.keys(stocks).forEach(k => {
+      const item = stocks[k];
+      if(item && item.category && item.category.trim() === selectedCategory.trim() && item.status === 'available') {
+        found++;
+        tbody.insertAdjacentHTML('beforeend', `
+          <tr>
+            <td data-label="Select"><input type="checkbox" class="stock-checkbox" value="${k}"></td>
+            <td data-label="Account Details"><code>${escapeHtml(item.accountDetails)}</code></td>
+            <td data-label="Price">৳${escapeHtml(item.price)}</td>
+            <td data-label="Status"><span class="badge-approved">Available</span></td>
+            <td data-label="Action"><button class="btn-delete" onclick="deleteStockItem('${k}')" title="Delete Mail"><i class="fa-solid fa-trash"></i></button></td>
+          </tr>
+        `);
+      }
+    });
+
+    if(found === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="text-muted text-center py-4">No available stocks found in this category</td></tr>';
+    }
+  }
+
+  function updateCategoryBulkPrice(){
+    const selectedCategory = document.getElementById('viewStockCategory').value;
+    const newPrice = parseFloat(document.getElementById('bulkNewPrice').value);
+
+    if(!selectedCategory) { showToast('Please select a category first!'); return; }
+    if(isNaN(newPrice) || newPrice < 0){ showToast('Please enter a valid price!'); return; }
+
+    const updates = {};
+    let count = 0;
+
+    Object.keys(globalCache.stocks).forEach(k => {
+      const item = globalCache.stocks[k];
+      if(item && item.category && item.category.trim() === selectedCategory.trim() && item.status === 'available') {
+        updates[`stocks/${k}/price`] = newPrice;
+        count++;
+      }
+    });
+
+    if(count === 0) { showToast('No available stocks found to update!'); return; }
+
+    db.ref().update(updates).then(() => {
+      showToast(`Successfully updated price for ${count} item(s)!`);
+      document.getElementById('bulkNewPrice').value = '';
+      loadCachedData();
+    }).catch(e => showToast('Error: '+e.message));
+  }
+
+  function toggleSelectAllStocks(masterCheckbox){
+    document.querySelectorAll('.stock-checkbox').forEach(cb => cb.checked = masterCheckbox.checked);
+  }
+
+  function deleteSelectedStocks(){
+    const selectedCheckboxes = document.querySelectorAll('.stock-checkbox:checked');
+    if(selectedCheckboxes.length === 0){ showToast('Please select at least one mail!'); return; }
+    if(!confirm(`Delete ${selectedCheckboxes.length} selected mail(s)?`)) return;
+
+    let updates = {};
+    selectedCheckboxes.forEach(cb => { updates[`stocks/${cb.value}`] = null; });
+
+    db.ref().update(updates).then(() => {
+      showToast('Deleted successfully');
+      loadCachedData();
+      const masterCb = document.getElementById('selectAllStocks');
+      if(masterCb) masterCb.checked = false;
+    }).catch(e => showToast('Error: '+e.message));
+  }
+
+  function deleteStockItem(key){
+    if(!confirm('Delete this mail stock?')) return;
+    db.ref(`stocks/${key}`).remove().then(() => {
+      showToast('Deleted successfully');
+      loadCachedData();
+    }).catch(e => showToast('Error: '+e.message));
+  }
+
+  function loadStockFile(e){ 
+    const f = e.target.files[0]; 
+    if(!f) return; 
+    const r = new FileReader(); 
+    r.onload = ev => { document.getElementById('stockAccounts').value = (ev.target.result||'').trim(); showToast('File loaded'); }; 
+    r.readAsText(f); 
+  }
+  
+  function uploadStocks(){
+    const cat = document.getElementById('stockCategory').value.trim();
+    const price = parseFloat(document.getElementById('stockPrice').value);
+    const raw = document.getElementById('stockAccounts').value.trim();
+    if(!cat) return showToast('Select category'); 
+    if(isNaN(price)||price<=0) return showToast('Enter valid price'); 
+    if(!raw) return showToast('Paste accounts');
+    
+    const lines = raw.split('\n').map(l=>l.trim()).filter(Boolean); 
+    let updates = {};
+    lines.forEach(line => {
+      const newKey = db.ref('stocks').push().key;
+      updates[`stocks/${newKey}`] = {category:cat, price:price, accountDetails:line, status:'available', soldTo:null};
+    });
+    
+    db.ref().update(updates).then(() => {
+      document.getElementById('stockAccounts').value=''; 
+      showToast(`Uploaded ${lines.length} accounts successfully!`); 
+      loadCachedData();
+    });
+  }
+
+  function renderDeposits(){
+    const q = (document.getElementById('searchTrx').value||'').trim().toLowerCase(); 
+    const status = document.getElementById('filterStatus').value;
+    const body = document.getElementById('depositsBody'); 
+    body.innerHTML = '';
+    
+    const deposits = globalCache.deposits;
+    const keys = Object.keys(deposits || {}); 
+    if(!keys.length){ 
+      body.innerHTML = '<tr><td colspan="6" class="text-muted text-center py-4">No deposits found</td></tr>'; 
+      return; 
+    }
+    
+    keys.reverse().forEach(k=>{ 
+      const d = deposits[k]; 
+      if(status && d.status!==status) return; 
+      if(q && !(String(d.trx||'').toLowerCase().includes(q))) return;
+      
+      const statusHtml = d.status==='Approved' ? '<span class="badge-approved">Approved</span>' : (d.status==='Rejected' ? '<span class="badge-rejected">Rejected</span>':'<span class="badge-pending">Pending</span>');
+      let trxContent = `<code style="color:#93c5fd">${escapeHtml(d.trx||'')}</code>`;
+      
+      body.insertAdjacentHTML('beforeend', `
+        <tr>
+          <td data-label="User">${escapeHtml(d.email||'')}</td>
+          <td data-label="Method"><span class="provider-pill">${escapeHtml(d.method||'')}</span></td>
+          <td data-label="Amount"><strong>৳${d.amount||0}</strong></td>
+          <td data-label="TrxID & Reason">${trxContent}</td>
+          <td data-label="Status">${statusHtml}</td>
+          <td data-label="Action" style="text-align: right;">
+            ${d.status==='Pending'?`
+              <div class="btn-action-group justify-content-end">
+                <button class="btn-deposit-approve" onclick="approveDeposit('${k}','${d.email}','${d.amount}')">
+                  <i class="fa-solid fa-check"></i> Approve
+                </button>
+                <button class="btn-deposit-reject" onclick="rejectDeposit('${k}')">
+                  <i class="fa-solid fa-xmark"></i> Reject
+                </button>
+              </div>
+            `:'<span class="text-muted" style="font-size:12px;">Completed</span>'}
+          </td>
+        </tr>
+      `);
+    });
+  }
+
+  function approveDeposit(key, email, amount){
+    const safeKey = email.toLowerCase().trim().replace(/[@.]/g, '_');
+    const addAmt = parseFloat(amount);
+    const currentBal = parseFloat(globalCache.balances[safeKey] || 0);
+    const newBal = parseFloat((currentBal + addAmt).toFixed(2));
+
+    let updates = {};
+    updates[`balances/${safeKey}`] = newBal;
+    updates[`deposits/${key}/status`] = 'Approved';
+    updates[`deposits/${key}/timestamp`] = Date.now();
+
+    db.ref().update(updates).then(() => {
+      showToast('Deposit approved and balance updated successfully');
+      loadCachedData();
+    });
+  }
+
+  function rejectDeposit(key){
+    db.ref(`deposits/${key}/status`).set('Rejected').then(() => {
+      showToast('Deposit rejected');
+      loadCachedData();
+    });
+  }
+
+  function renderPayments(){
+    const methods = globalCache.paymentMethods;
+    const tbody = document.getElementById('paymentsBody');
+    tbody.innerHTML = '';
+    const keys = Object.keys(methods);
+    if(!keys.length) { tbody.innerHTML = '<tr><td colspan="5" class="text-muted text-center py-4">No payment methods found</td></tr>'; return; }
+    keys.forEach(k => {
+      const m = methods[k];
+      tbody.insertAdjacentHTML('beforeend', `
+        <tr>
+          <td data-label="Name">
+            ${m.logo ? `<img src="${escapeHtml(m.logo)}" style="width:30px;height:30px;border-radius:8px;object-fit:cover;margin-right:10px;vertical-align:middle;">` : ''}
+            <strong>${escapeHtml(m.name)}</strong>
+          </td>
+          <td data-label="Type">${escapeHtml(m.type)}</td>
+          <td data-label="Number"><code>${escapeHtml(m.number)}</code></td>
+          <td data-label="Logo URL"><code>${escapeHtml(m.logo || 'No Logo')}</code></td>
+          <td data-label="Action"><button class="btn-delete" onclick="removePayment('${k}')"><i class="fa-solid fa-trash"></i></button></td>
+        </tr>
+      `);
+    });
+  }
+
+  function addPayment(){
+    const name = document.getElementById('payName').value.trim();
+    const type = document.getElementById('payType').value.trim();
+    const number = document.getElementById('payNumber').value.trim();
+    const logo = document.getElementById('payLogo').value.trim();
+    if(!name || !number) { showToast('Enter name and number/details'); return; }
+    db.ref('paymentMethods').push({ name, type, number, logo }).then(() => {
+      document.getElementById('payName').value = '';
+      document.getElementById('payNumber').value = '';
+      document.getElementById('payLogo').value = '';
+      showToast('Payment method added successfully');
+      loadCachedData();
+    });
+  }
+
+  function removePayment(key){
+    if(!confirm('Delete payment method?')) return;
+    db.ref(`paymentMethods/${key}`).remove().then(() => {
+      showToast('Payment method removed');
+      loadCachedData();
+    });
+  }
+
+  function saveSupport(){
+    const link = document.getElementById('supportInput').value.trim();
+    db.ref('settings/supportTelegram').set(link).then(() => showToast('Support link saved successfully'));
+  }
+
+  function loadSupportSettings(){
+    if(globalCache.settings.supportTelegram) document.getElementById('supportInput').value = globalCache.settings.supportTelegram;
+    if(globalCache.settings.binanceRate) document.getElementById('binanceRateInput').value = globalCache.settings.binanceRate;
+    if(globalCache.settings.userNotification) document.getElementById('adminNotificationInput').value = globalCache.settings.userNotification;
+  }
+
+  function saveBinanceRate(){
+    const rate = parseFloat(document.getElementById('binanceRateInput').value);
+    if(isNaN(rate) || rate <= 0) { showToast('Enter a valid rate'); return; }
+    db.ref('settings/binanceRate').set(rate).then(() => showToast('Binance dollar rate saved successfully'));
+  }
+
+  function saveUserNotification(){
+    const text = document.getElementById('adminNotificationInput').value.trim();
+    if(!text) { showToast('Enter notification message'); return; }
+    db.ref('settings/userNotification').set(text).then(() => showToast('Notification broadcasted successfully!'));
+  }
+
+  function clearUserNotification(){
+    db.ref('settings/userNotification').set('').then(() => {
+      document.getElementById('adminNotificationInput').value = '';
+      showToast('Notification cleared from user panels');
+    });
+  }
+
+  function renderUsers(){
+    const q = (document.getElementById('searchUserGmail').value || '').trim().toLowerCase();
+    const tbody = document.getElementById('usersBody');
+    tbody.innerHTML = '';
+    
+    let entries = Object.entries(globalCache.users);
+    if(entries.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="3" class="text-muted text-center py-4">No users found</td></tr>';
+      return;
+    }
+
+    const uniqueUsersMap = new Map();
+    entries.forEach(([key, u]) => {
+      if (u && u.email) {
+        const cleanEmail = u.email.toLowerCase().trim();
+        if (!uniqueUsersMap.has(cleanEmail)) {
+          const safeKey = cleanEmail.replace(/[@.]/g, '_');
+          uniqueUsersMap.set(cleanEmail, { safeKey, email: cleanEmail, originalEmail: u.email });
+        }
+      }
+    });
+
+    let uniqueEntries = Array.from(uniqueUsersMap.values());
+    let found = 0;
+
+    uniqueEntries.forEach((u) => {
+      if(q && !u.email.includes(q)) return;
+      found++;
+      
+      const bal = globalCache.balances[u.safeKey] || 0;
+      tbody.insertAdjacentHTML('beforeend', `
+        <tr>
+          <td data-label="Email"><strong>${escapeHtml(u.originalEmail)}</strong></td>
+          <td data-label="Balance"><strong class="text-success">৳${bal}</strong></td>
+          <td data-label="Action">
+            <button class="btn btn-sm btn-outline-warning rounded-pill px-3 py-2 me-1" onclick="openBalanceModal('${u.safeKey}', '${escapeHtml(u.originalEmail)}', ${bal})"><i class="fa-solid fa-calculator me-1"></i> +/- Balance</button>
+            <button class="btn btn-sm btn-danger rounded-pill px-3 py-2" onclick="deleteUser('${u.safeKey}', '${escapeHtml(u.originalEmail)}')"><i class="fa-solid fa-trash me-1"></i> Delete</button>
+          </td>
+        </tr>
+      `);
+    });
+
+    if(found === 0) {
+      tbody.innerHTML = '<tr><td colspan="3" class="text-muted text-center py-4">No matching users found</td></tr>';
+    }
+  }
+
+  let currentEditingUserKey = null;
+  function openBalanceModal(safeKey, email, currentBal){
+    currentEditingUserKey = safeKey;
+    document.getElementById('modalUserEmailLabel').innerText = 'User: ' + email;
+    document.getElementById('modalCurrentBalance').innerText = '৳' + currentBal;
+    document.getElementById('balanceInputAmount').value = '';
+    const myModal = new bootstrap.Modal(document.getElementById('balanceModal'));
+    myModal.show();
+  }
+
+  function modifyUserBalance(action){
+    if(!currentEditingUserKey) return;
+    const inputVal = parseFloat(document.getElementById('balanceInputAmount').value);
+    if(isNaN(inputVal) || inputVal <= 0){ showToast('Please enter a valid amount!'); return; }
+
+    let currentBal = parseFloat(globalCache.balances[currentEditingUserKey] || 0);
+    let newBal = currentBal;
+
+    if(action === 'plus') newBal = currentBal + inputVal;
+    else if(action === 'minus') {
+      newBal = currentBal - inputVal;
+      if(newBal < 0) newBal = 0;
+    }
+
+    db.ref(`balances/${currentEditingUserKey}`).set(newBal).then(() => {
+      globalCache.balances[currentEditingUserKey] = newBal;
+      showToast(`Balance successfully updated!`);
+      document.getElementById('modalCurrentBalance').innerText = '৳' + newBal;
+      document.getElementById('balanceInputAmount').value = '';
+      renderUsers();
+    }).catch(e => showToast('Error: ' + e.message));
+  }
+
+  function deleteUser(safeKey, email){
+    if(!confirm(`Delete user: ${email}?`)) return;
+
+    let updates = {};
+    updates[`balances/${safeKey}`] = null;
+
+    Object.keys(globalCache.users).forEach(k => {
+      let u = globalCache.users[k];
+      if(u && u.email && u.email.toLowerCase().trim() === email.toLowerCase().trim()) {
+        updates[`users/${k}`] = null;
+      }
+    });
+
+    db.ref().update(updates).then(() => {
+      showToast('User deleted successfully!');
+      loadCachedData();
+    }).catch(e => showToast('Error: ' + e.message));
+  }
+</script>
+</body>
+</html>
